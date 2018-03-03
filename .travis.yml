@@ -1,4 +1,7 @@
 language: ruby
 
 services:
-- docker
+    - docker
+
+script:
+    - ./docker/build.sh
