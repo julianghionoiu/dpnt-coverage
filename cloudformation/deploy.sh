@@ -4,4 +4,4 @@ aws \
      cloudformation \
         create-stack \
             --stack-name dpnt-coverage \
-            --template-body file://cloudformation.ym
+            --template-body file://definition.yml

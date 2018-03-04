@@ -1,0 +1,82 @@
+################################################################################
+# Cloud formation definition for dpnt_coverage
+################################################################################
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+    Cloudfront template to run TesterCluster using ECS
+################################################################################
+Parameters:
+    EcsClusterName:
+        Type: String
+        Description: >
+            associated
+            Specifies the ECS Cluster Name with which the resources would be
+        Default: 'CoverageRunnerCluster'
+    # Pass the source code URL from the cloudformation executor.
+    SourceCodeUrl:
+        Type: String
+        Default: 'http://s3.amazonaws.com/'
+################################################################################
+Resources:
+    Cluster:
+        Type: AWS::ECS::Cluster
+        Properties:
+            ClusterName: !Ref EcsClusterName
+    AutoScalingGroup:
+        Type: AWS::AutoScaling::AutoScalingGroup
+        Properties:
+            LaunchConfigurationName: !Ref 'ContainerInstances'
+            MinSize: '1'
+            MaxSize: '2'
+            DesiredCapacity: '1'
+            VPCZoneIdentifier:
+                - !Ref 'VpcSubnet'
+        CreationPolicy:
+            ResourceSignal:
+                Timeout: PT15M
+        UpdatePolicy:
+            AutoScalingReplacingUpdate:
+                WillReplace: 'true'
+    ContainerInstances:
+        Type: AWS::AutoScaling::LaunchConfiguration
+        Properties:
+            ImageId: ami-a900a3ca
+            #ImageId: !FindInMap [AWSRegionToAMI, !Ref 'AWS::Region', AMIID]
+            InstanceType: t2.micro
+            UserData:
+                #This will signal to autoscaling group to continue
+                Fn::Base64: !Sub |
+                    #!/bin/bash -xe
+                    echo ECS_CLUSTER=${Cluster} >> /etc/ecs/ecs.config
+                    yum install -y aws-cfn-bootstrap
+                    /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource AutoScalingGroup --region ${AWS::Region}
+    TaskDefinition:
+        Type: AWS::ECS::TaskDefinition
+        Properties:
+            ContainerDefinitions:
+                -   Name: busybox
+                    Cpu: 5
+                    Command: ['/bin/sh -c "while true; do date; sleep 5; done"']
+                    EntryPoint: [sh, -c]
+                    Essential: true
+                    Image: busybox
+                    Memory: 200
+                    # Pass the source code URL here
+                    Environment:
+                        -   Name: DPNT_COVERAGE_SOURCE_URL
+                            Value: "http://www.example.com"
+    Service:
+        Type: AWS::ECS::Service
+        Properties:
+            Cluster: !Ref 'Cluster'
+            DesiredCount: '1'
+            TaskDefinition: !Ref 'TaskDefinition'
+    Vpc:
+        Type: AWS::EC2::VPC
+        Properties:
+            CidrBlock: 10.0.0.0/16
+    VpcSubnet:
+        Type: AWS::EC2::Subnet
+        Properties:
+            CidrBlock: 10.0.10.0/24
+            VpcId: !Ref Vpc

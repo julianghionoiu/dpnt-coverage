@@ -3,6 +3,10 @@ Lambda handler to receive SNS event and then run ECS RunTask
 """
 
 import json
+import boto
+import os
+
+CLOUDFORMATION_TEMPLATE_URL=os.environ.get('CLOUDFORMATION_TEMPLATE_URL')
 
 def generate_coverage(event, context):
     body = {
@@ -25,3 +29,11 @@ def generate_coverage(event, context):
         "event": event
     }
     """
+
+def deploy_coverage_runner():
+    client = boto3.client('cloudformation')
+    stack_name = 'Coverage_Runner_' + 'blablabla'
+    client.create_stack(
+        StackName=stack_name,
+        TemplateUrl=CLOUDFORMATION_TEMPLATE_URL
+    )
