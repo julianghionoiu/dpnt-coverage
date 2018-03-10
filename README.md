@@ -5,8 +5,28 @@ Collect coverage from SRCS files
 The main directories for this code
 
 - cloudformation
-  Contains cloudformation definition for ECS cluster that runs the tests and collect coverage.
+  Contains cloudformation definition for CodeBuild runs the tests and collect coverage.
 - docker
-  Contains docker definition for ECS image for running the test and collect the coverage.
+  Contains docker definition for CodeBuild image for running the test and collect the coverage.
 - lambda
   Contains lambda definition that receives the SRCS files and execute the cloudformation to run the coverage.
+
+# Docker Image
+
+To run the docker image, execute
+
+```
+docker build -t julianghionoiu/tdl-coverage - < ./docker/Dockerfile
+```
+
+To test the docker image, execute
+
+```
+docker run \
+        -v \"$PWD/etc":/tmp/etc/ \
+    julianghionoiu/tdl-coverage \
+        java -jar /opt/dev-sourcecode-record.jar \
+            convert-to-git \
+                --input /tmp/etc/test.srcs \
+                --output /tmp/etc/output
+```
