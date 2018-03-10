@@ -3,80 +3,48 @@
 ################################################################################
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >
-    Cloudfront template to run TesterCluster using ECS
+    Cloudfront template to run CodeBuild
 ################################################################################
 Parameters:
-    EcsClusterName:
+    CodeBuildName:
         Type: String
-        Description: >
-            associated
-            Specifies the ECS Cluster Name with which the resources would be
         Default: 'CoverageRunnerCluster'
     # Pass the source code URL from the cloudformation executor.
-    SourceCodeUrl:
+    SourceCodeBucket:
         Type: String
-        Default: 'http://s3.amazonaws.com/'
+        Default: ''
+    SourceCodePath:
+        Type: String
+        Default: ''
 ################################################################################
 Resources:
-    Cluster:
-        Type: AWS::ECS::Cluster
+    CodeBuild:
+        Type: AWS::CodeBuild::Project
         Properties:
-            ClusterName: !Ref EcsClusterName
-    AutoScalingGroup:
-        Type: AWS::AutoScaling::AutoScalingGroup
+            Name: dpnt-coverage
+            Description: Coverage builder
+            ServiceRole: !Ref CodeBuildRole
+            Artifacts:
+                Type: no_artifacts
+            Environment:
+                Type: LINUX_CONTAINER
+                ComputeType: BUILD_GENERAL1_SMALL
+                Image: aws/codebuild/java:openjdk-8
+            Source:
+                #TODO: Use parameters
+                Location: codebuild-demo-test/0123ab9a371ebf0187b0fe5614fbb72c
+                Type: S3
+            TimeoutInMinutes: 5
+    CodeBuildRole:
+        Type: AWS::IAM::Role
         Properties:
-            LaunchConfigurationName: !Ref 'ContainerInstances'
-            MinSize: '1'
-            MaxSize: '2'
-            DesiredCapacity: '1'
-            VPCZoneIdentifier:
-                - !Ref 'VpcSubnet'
-        CreationPolicy:
-            ResourceSignal:
-                Timeout: PT15M
-        UpdatePolicy:
-            AutoScalingReplacingUpdate:
-                WillReplace: 'true'
-    ContainerInstances:
-        Type: AWS::AutoScaling::LaunchConfiguration
-        Properties:
-            ImageId: ami-a900a3ca
-            #ImageId: !FindInMap [AWSRegionToAMI, !Ref 'AWS::Region', AMIID]
-            InstanceType: t2.micro
-            UserData:
-                #This will signal to autoscaling group to continue
-                Fn::Base64: !Sub |
-                    #!/bin/bash -xe
-                    echo ECS_CLUSTER=${Cluster} >> /etc/ecs/ecs.config
-                    yum install -y aws-cfn-bootstrap
-                    /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource AutoScalingGroup --region ${AWS::Region}
-    TaskDefinition:
-        Type: AWS::ECS::TaskDefinition
-        Properties:
-            ContainerDefinitions:
-                -   Name: busybox
-                    Cpu: 5
-                    Command: ['/bin/sh -c "while true; do date; sleep 5; done"']
-                    EntryPoint: [sh, -c]
-                    Essential: true
-                    Image: busybox
-                    Memory: 200
-                    # Pass the source code URL here
-                    Environment:
-                        -   Name: DPNT_COVERAGE_SOURCE_URL
-                            Value: "http://www.example.com"
-    Service:
-        Type: AWS::ECS::Service
-        Properties:
-            Cluster: !Ref 'Cluster'
-            DesiredCount: '1'
-            TaskDefinition: !Ref 'TaskDefinition'
-    Vpc:
-        Type: AWS::EC2::VPC
-        Properties:
-            CidrBlock: 10.0.0.0/16
-    VpcSubnet:
-        Type: AWS::EC2::Subnet
-        Properties:
-            CidrBlock: 10.0.10.0/24
-            VpcId: !Ref Vpc
+            AssumeRolePolicyDocument:
+                Statement:
+                    -   Action:
+                            - "sts:AssumeRole"
+                        Effect: Allow
+                        Principal:
+                            Service:
+                                - "codebuild.amazonaws.com"
+                Version: '2012-10-17'
+                #TODO: Add policy to access bucket
