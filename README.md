@@ -30,3 +30,13 @@ docker run \
                 --input /tmp/etc/test.srcs \
                 --output /tmp/etc/output
 ```
+
+
+# CloudFormation
+
+To deploy cloudformation files
+
+```
+cd cloudformation
+source ../.env.local && export $(cut -d= -f1 ../.env.local) && bash ./deploy.sh
+```
