@@ -1,0 +1,50 @@
+################################################################################
+# Cloud formation definition for dpnt_coverage
+################################################################################
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+    Cloudfront template to run CodeBuild
+################################################################################
+Parameters:
+    CodeBuildName:
+        Type: String
+        Default: 'CoverageRunnerCluster'
+    # Pass the source code URL from the cloudformation executor.
+    SourceCodeBucket:
+        Type: String
+        Default: ''
+    SourceCodePath:
+        Type: String
+        Default: ''
+################################################################################
+Resources:
+    CodeBuild:
+        Type: AWS::CodeBuild::Project
+        Properties:
+            Name: dpnt-coverage
+            Description: Coverage builder
+            ServiceRole: !Ref CodeBuildRole
+            Artifacts:
+                Type: no_artifacts
+            Environment:
+                Type: LINUX_CONTAINER
+                ComputeType: BUILD_GENERAL1_SMALL
+                Image: aws/codebuild/java:openjdk-8
+            Source:
+                #TODO: Use parameters
+                Location: codebuild-demo-test/0123ab9a371ebf0187b0fe5614fbb72c
+                Type: S3
+            TimeoutInMinutes: 5
+    CodeBuildRole:
+        Type: AWS::IAM::Role
+        Properties:
+            AssumeRolePolicyDocument:
+                Statement:
+                    -   Action:
+                            - "sts:AssumeRole"
+                        Effect: Allow
+                        Principal:
+                            Service:
+                                - "codebuild.amazonaws.com"
+                Version: '2012-10-17'
+                #TODO: Add policy to access bucket
