@@ -10,13 +10,12 @@ challengeId=$3
 
 dockerImageName="accelerate-io/tdl-runner-java"
 dockerImageVersion="v01"
+WORKING_DIR="/home/ubuntu/"
 
 docker run                                                                      \
       --rm                                                                      \
       --interactive                                                             \
       --volume ${PWD}/getLineCoverageFor.sh:/home/ubuntu/getLineCoverageFor.sh  \
-      --workdir=/home/ubuntu/                                                   \
+      --workdir=${WORKING_DIR}                                                  \
       ${dockerImageName}:${dockerImageVersion}                                  \
-        ./getLineCoverageFor.sh ${repo} ${tag} ${challengeId}
-		
-		
+        ./getLineCoverageFor.sh ${WORKING_DIR} ${repo} ${tag} ${challengeId}
