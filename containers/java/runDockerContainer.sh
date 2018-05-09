@@ -4,14 +4,12 @@ set -e
 set -u
 set -o pipefail
 
-WORKING_DIR=$1
-REPO=$2
-TAG=$3	
-CHALLENGE_ID=$4
+REPO=$1
+TAG=$2	
+CHALLENGE_ID=$3
 
 dockerImageName="accelerate-io/tdl-runner-java"
 dockerImageVersion="v01"
-WORKING_DIR="/home/ubuntu/"
 
 echo "Checking for the presence of ${dockerImageName}":"${dockerImageVersion} in the local docker registry"
 foundDockerImage=$(docker images --filter="reference=${dockerImageName}" | grep "${dockerImageName}" || true)
@@ -28,10 +26,8 @@ echo "Running ${dockerImageName}":"${dockerImageVersion} from the local docker r
 docker run                                                                      \
       --rm                                                                      \
       --interactive                                                             \
-      --workdir=${WORKING_DIR}                                                  \
-      -env WORKING_DIR=${WORKING_DIR}                                           \
-      -env REPO=${REPO}                                                         \
-      -env TAG=${TAG}                                                           \
-      -env CHALLENGE_ID=${CHALLENGE_ID}                                         \
+      --workdir=/home/ubuntu                                                    \
+      --env REPO=${REPO}                                                        \
+      --env TAG=${TAG}                                                          \
+      --env CHALLENGE_ID=${CHALLENGE_ID}                                        \
       ${dockerImageName}:${dockerImageVersion}
-        

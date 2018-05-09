@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y \
                               git \
         --no-install-recommends && rm -r /var/lib/apt/lists/*
 
-ADD fetch_repo_and_collect_coverage.sh ${WORKING_DIR}
+WORKDIR /home/ubuntu/
+ADD ./fetch_repo_and_collect_coverage.sh /home/ubuntu/fetch_repo_and_collect_coverage.sh
 
-ENTRYPOINT fetch_repo_and_collect_coverage.sh ${WORKING_DIR} ${REPO} ${TAG} ${CHALLENGE_ID}
+ENTRYPOINT /home/ubuntu/fetch_repo_and_collect_coverage.sh ${REPO} ${TAG} ${CHALLENGE_ID}
