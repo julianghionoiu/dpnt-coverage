@@ -6,8 +6,8 @@ set -o pipefail
 
 SCRIPT_CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-dockerImageName=${1:-accelerate-io/tdl-runner-java}
-dockerImageVersion=${2:-v01}
+dockerImageName=${1}
+dockerImageVersion=${2}
 
 echo "Building docker image for with the name ${dockerImageName}:${dockerImageVersion}"
 docker build -t ${dockerImageName}:${dockerImageVersion} ${SCRIPT_CURRENT_DIR}/.

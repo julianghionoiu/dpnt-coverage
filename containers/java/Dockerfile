@@ -1,8 +1,9 @@
 FROM java:8u111-jdk
 
 RUN apt-get update && apt-get install -y \
-		                      gradle \
+		              gradle \
                               git \
+                              libxml2-utils \
         --no-install-recommends && rm -r /var/lib/apt/lists/*
 
 WORKDIR /home/ubuntu/
