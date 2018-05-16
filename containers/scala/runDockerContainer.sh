@@ -13,16 +13,8 @@ CHALLENGE_ID=$3
 dockerImageName="accelerate-io/dpnt-coverage-scala"
 dockerImageVersion="0.1"
 
-echo "Checking for the presence of ${dockerImageName}":"${dockerImageVersion} in the local docker registry"
-foundDockerImage=$(docker images --filter="reference=${dockerImageName}" | grep "${dockerImageName}" || true)
-if [[ -z ${foundDockerImage} ]]; then
-  ${SCRIPT_CURRENT_DIR}/buildDockerImage.sh "${dockerImageName}" "${dockerImageVersion}"
-
-  if [[ $? -ne 0 ]]; then
-    echo "There was a problem building the docker image needed to run this task, process exited with error code '$?'"
-    exit -1
-  fi
-fi
+echo "Quickly triggering a re-build of the docker image '${dockerImageName}":"${dockerImageVersion}'"
+${SCRIPT_CURRENT_DIR}/buildDockerImage.sh "${dockerImageName}" "${dockerImageVersion}"
 
 echo "Running ${dockerImageName}":"${dockerImageVersion} from the local docker registry"
 docker run                                                                      \

@@ -13,4 +13,5 @@ echo "Building docker image for with the name ${dockerImageName}:${dockerImageVe
 docker build -t ${dockerImageName}:${dockerImageVersion} ${SCRIPT_CURRENT_DIR}/.
 
 echo "Remove any dangling images from the local registry"
-docker images -q -f dangling=true | xargs docker rmi -f  || true
+imagesToRemove=$(docker images -q -f dangling=true)
+[ ! -z ${imagesToRemove} ] && docker rmi -f $imagesToRemove || true
