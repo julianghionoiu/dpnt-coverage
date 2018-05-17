@@ -19,8 +19,6 @@ ${SCRIPT_CURRENT_DIR}/buildDockerImage.sh "${dockerImageName}" "${dockerImageVer
 echo "Running ${dockerImageName}":"${dockerImageVersion} from the local docker registry"
 docker run                                                                      \
       --rm                                                                      \
-      --interactive                                                             \
-      --workdir=/home/ubuntu                                                    \
       --env REPO=${REPO}                                                        \
       --env TAG=${TAG}                                                          \
       --env CHALLENGE_ID=${CHALLENGE_ID}                                        \
