@@ -1,0 +1,23 @@
+################################################################################
+#
+################################################################################
+service: dpnt-coverage
+
+provider:
+    name: aws
+    runtime: java8
+    stage: ${opt:stage, 'local'}
+    region: eu-west-2
+
+    memorySize: 1536 # in MB
+    timeout: 120 # in seconds
+    versionFunctions: false
+    environment: ${file(config/env.${self:provider.stage}.yml)}
+
+package:
+    artifact: build/libs/dpnt-coverage-all.jar
+
+functions:
+    call-ecs-to-compute-coverage:
+        handler: tdl.datapoint.coverage.CoverageUploadHandler
+        onError: arn:aws:sns:eu-west-2:577770582757:MyselfEU2
