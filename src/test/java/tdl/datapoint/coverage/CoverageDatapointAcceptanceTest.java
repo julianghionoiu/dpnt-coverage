@@ -6,16 +6,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.*;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.TemporaryFolder;
+import org.yaml.snakeyaml.Yaml;
 import tdl.datapoint.coverage.support.LocalS3Bucket;
 import tdl.datapoint.coverage.support.LocalSQSQueue;
 import tdl.datapoint.coverage.support.TestSrcsFile;
 import tdl.participant.queue.connector.EventProcessingException;
 import tdl.participant.queue.connector.QueueEventHandlers;
 import tdl.participant.queue.connector.SqsEventQueue;
-import tdl.participant.queue.events.SourceCodeUpdatedEvent;
+import tdl.participant.queue.events.CoverageComputedEvent;
+import tdl.participant.queue.events.ProgrammingLanguageDetectedEvent;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -32,36 +38,53 @@ public class CoverageDatapointAcceptanceTest {
 
     private CoverageUploadHandler coverageUploadHandler;
     private SqsEventQueue sqsEventQueue;
-    private Stack<SourceCodeUpdatedEvent> sourceCodeUpdatedEvents;
+    private LocalS3Bucket localS3Bucket;
+    private Stack<CoverageComputedEvent> coverageComputedEvents;
+    private Stack<ProgrammingLanguageDetectedEvent> languageDetectedEvents;
 
     @Before
-    public void setUp() throws EventProcessingException {
-        //DEBT should read this from the `config/env.local.yml`
-        env(ApplicationEnv.SQS_ENDPOINT, LocalSQSQueue.ELASTIC_MQ_URL);
-        env(ApplicationEnv.SQS_REGION, LocalSQSQueue.ELASTIC_MQ_REGION);
-        env(ApplicationEnv.SQS_ACCESS_KEY, LocalSQSQueue.ELASTIC_MQ_ACCESS_KEY);
-        env(ApplicationEnv.SQS_SECRET_KEY, LocalSQSQueue.ELASTIC_MQ_SECRET_KEY);
-        env(ApplicationEnv.SQS_QUEUE_URL, LocalSQSQueue.ELASTIC_MQ_QUEUE_URL);
+    public void setUp() throws EventProcessingException, IOException {
+        setEnvFrom(Paths.get("config", "env.local.yml"));
 
-        env(ApplicationEnv.S3_ENDPOINT, LocalS3Bucket.MINIO_URL);
-        env(ApplicationEnv.S3_REGION, LocalS3Bucket.MINIO_REGION);
-        env(ApplicationEnv.S3_ACCESS_KEY, LocalS3Bucket.MINIO_ACCESS_KEY);
-        env(ApplicationEnv.S3_SECRET_KEY, LocalS3Bucket.MINIO_SECRET_KEY);
+        localS3Bucket = LocalS3Bucket.createInstance(
+                getEnv(ApplicationEnv.S3_ENDPOINT),
+                getEnv(ApplicationEnv.S3_REGION),
+                getEnv(ApplicationEnv.S3_ACCESS_KEY),
+                getEnv(ApplicationEnv.S3_SECRET_KEY));
+
+        sqsEventQueue = LocalSQSQueue.createInstance(
+                getEnv(ApplicationEnv.SQS_ENDPOINT),
+                getEnv(ApplicationEnv.SQS_REGION),
+                getEnv(ApplicationEnv.SQS_ACCESS_KEY),
+                getEnv(ApplicationEnv.SQS_SECRET_KEY),
+                getEnv(ApplicationEnv.SQS_QUEUE_URL));
 
         coverageUploadHandler = new CoverageUploadHandler();
 
-        sqsEventQueue = LocalSQSQueue.createInstance();
-
         QueueEventHandlers queueEventHandlers = new QueueEventHandlers();
-        sourceCodeUpdatedEvents = new Stack<>();
-        queueEventHandlers.on(SourceCodeUpdatedEvent.class, sourceCodeUpdatedEvents::add);
+        coverageComputedEvents = new Stack<>();
+        queueEventHandlers.on(CoverageComputedEvent.class, coverageComputedEvents::add);
+        languageDetectedEvents = new Stack<>();
+        queueEventHandlers.on(ProgrammingLanguageDetectedEvent.class, languageDetectedEvents::add);
         sqsEventQueue.subscribeToMessages(queueEventHandlers);
     }
 
-    private void env(ApplicationEnv key, String value) {
-        environmentVariables.set(key.name(), value);
+    private static String getEnv(ApplicationEnv key) {
+        String env = System.getenv(key.name());
+        if (env == null || env.trim().isEmpty() || "null".equals(env)) {
+            throw new RuntimeException("[Startup] Environment variable " + key + " not set");
+        }
+        return env;
     }
 
+    private void setEnvFrom(Path path) throws IOException {
+        String yamlString = Files.lines(path).collect(Collectors.joining("\n"));
+
+        Yaml yaml = new Yaml();
+        Map<String, String> values = yaml.load(yamlString);
+
+        values.forEach((key, value) -> environmentVariables.set(key, value));
+    }
     @After
     public void tearDown() throws Exception {
         sqsEventQueue.unsubscribeFromMessages();
@@ -79,26 +102,26 @@ public class CoverageDatapointAcceptanceTest {
 
         // When - Upload event happens
         coverageUploadHandler.handleRequest(
-                convertToMap(LocalS3Bucket.putObject(srcs1.asFile(), s3destination)),
+                convertToMap(localS3Bucket.putObject(srcs1.asFile(), s3destination)),
                 NO_CONTEXT);
 
         // Then - Repo is created with the contents of the SRCS file
         waitForQueueToReceiveEvents();
-        SourceCodeUpdatedEvent queueEvent1 = sourceCodeUpdatedEvents.pop();
-        String repoUrl1 = queueEvent1.getSourceCodeLink();
+        CoverageComputedEvent queueEvent1 = coverageComputedEvents.pop();
+        String repoUrl1 = queueEvent1.getParticipant();
         assertThat(repoUrl1, allOf(startsWith("file:///"),
                 containsString(challengeId),
                 endsWith(participantId)));
 
         // When - Another upload event happens
         coverageUploadHandler.handleRequest(
-                convertToMap(LocalS3Bucket.putObject(srcs2.asFile(), s3destination)),
+                convertToMap(localS3Bucket.putObject(srcs2.asFile(), s3destination)),
                 NO_CONTEXT);
 
         // Then - The SRCS file is appended to the repo
         waitForQueueToReceiveEvents();
-        SourceCodeUpdatedEvent queueEvent2 = sourceCodeUpdatedEvents.pop();
-        String repoUrl2 = queueEvent2.getSourceCodeLink();
+        CoverageComputedEvent queueEvent2 = coverageComputedEvents.pop();
+        String repoUrl2 = queueEvent2.getParticipant();
         assertThat(repoUrl1, equalTo(repoUrl2));
     }
 
