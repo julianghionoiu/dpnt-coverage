@@ -2,7 +2,6 @@ package tdl.datapoint.coverage.processing;
 
 import com.amazonaws.services.s3.model.S3Object;
 import org.apache.commons.io.FileUtils;
-import org.eclipse.jgit.api.Git;
 import tdl.record.sourcecode.snapshot.file.ToGitConverter;
 
 import java.io.File;
@@ -12,11 +11,8 @@ import java.nio.file.Path;
 
 public class S3SrcsToGitExporter {
 
-    public void export(S3Object s3Object, Git localRepo) throws Exception {
+    public void export(S3Object s3Object, Path outputDir) throws Exception {
         Path inputFile = downloadObject(s3Object);
-        Path outputDir = localRepo.getRepository()
-                .getDirectory()
-                .toPath();
         ToGitConverter converter = new ToGitConverter(inputFile, outputDir);
         converter.convert();
     }

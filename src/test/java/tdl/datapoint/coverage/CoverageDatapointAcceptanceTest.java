@@ -99,7 +99,7 @@ public class CoverageDatapointAcceptanceTest {
         String challengeId = "TCH";
         String participantId = generateId();
         String s3destination = String.format("%s/%s/file.srcs", challengeId, participantId);
-        TestSrcsFile srcsForTestChallenge = new TestSrcsFile("LangHmmm_R1Cov33_R2Cov44.srcs");
+        TestSrcsFile srcsForTestChallenge = new TestSrcsFile("HmmmLang_R1Cov33_R2Cov44.srcs");
 
         // When - Upload event happens
         coverageUploadHandler.handleRequest(
@@ -113,7 +113,7 @@ public class CoverageDatapointAcceptanceTest {
         ProgrammingLanguageDetectedEvent languageEvent = languageDetectedEvents.get(0);
         assertThat(languageEvent.getParticipant(), equalTo(participantId));
         assertThat(languageEvent.getChallengeId(), equalTo(challengeId));
-        assertThat(languageEvent.getProgrammingLanguage(), equalTo("Hmmm"));
+        assertThat(languageEvent.getProgrammingLanguage(), equalTo("HmmmLang"));
 
         // Then - Coverage events are computed for the deploy tags
         assertThat(coverageComputedEvents.size(), equalTo(2));

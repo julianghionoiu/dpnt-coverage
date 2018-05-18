@@ -10,10 +10,17 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
-import tdl.datapoint.coverage.processing.*;
+import org.eclipse.jgit.api.Git;
+import tdl.datapoint.coverage.processing.Language;
+import tdl.datapoint.coverage.processing.LocalGitClient;
+import tdl.datapoint.coverage.processing.S3BucketEvent;
+import tdl.datapoint.coverage.processing.S3SrcsToGitExporter;
 import tdl.participant.queue.connector.SqsEventQueue;
-import tdl.participant.queue.events.SourceCodeUpdatedEvent;
+import tdl.participant.queue.events.ProgrammingLanguageDetectedEvent;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -89,12 +96,31 @@ public class CoverageUploadHandler implements RequestHandler<Map<String, Object>
         String participantId = event.getParticipantId();
         String challengeId = event.getChallengeId();
 
-        //TODO Implement the real logic
-        S3Object remoteSRCSFile = s3Client.getObject(event.getBucket(), event.getKey());
-        srcsToGitExporter.export(remoteSRCSFile, null);
+        LOG.info("Initialise local temp repo");
+        Path tempDirectory = Files.createTempDirectory(participantId);
+        Git localRepo = LocalGitClient.init(tempDirectory);
+        LOG.info("Local repo initialised at "+localRepo.getRepository().getDirectory());
 
-        participantEventQueue.send(new SourceCodeUpdatedEvent(System.currentTimeMillis(),
-                        participantId, challengeId,  null));
+        LOG.info("Read repo from SRCS file "+event.getKey());
+        S3Object remoteSRCSFile = s3Client.getObject(event.getBucket(), event.getKey());
+        srcsToGitExporter.export(remoteSRCSFile, tempDirectory);
+        LOG.info("SRCS file exported to: " + tempDirectory);
+
+        LOG.info("Identify language");
+        Path languageFile = tempDirectory.resolve("language.tdl");
+        String languageString = Files.lines(languageFile).findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("The repo provided does not have a valid `language.tdl` file"));
+        Language language = Language.of(languageString);
+        participantEventQueue.send(new ProgrammingLanguageDetectedEvent(System.currentTimeMillis(),
+                participantId, challengeId, language.getReportedLanguageName()));
+        LOG.info("Language identified as: "+language.getLanguageId());
+
+        LOG.info("Identify \"done\" tags");
+        List<String> tags = LocalGitClient.getTags(localRepo);
+        LOG.info("Relevant tags"+tags);
+
+        LOG.info("Triggering ECS to process coverage for tags");
+        //TODO for each tag, call ECS with: container-image id, bucket, key, tag ++ credentials for S3 and SQS
     }
 
 }
