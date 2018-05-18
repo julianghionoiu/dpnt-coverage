@@ -146,6 +146,8 @@ public class CoverageUploadHandler implements RequestHandler<Map<String, Object>
         LOG.info("Triggering ECS to process coverage for tags");
         for (String tag : tags) {
             RunTaskRequest runTaskRequest = new RunTaskRequest();
+            runTaskRequest.setTaskDefinition("myTaskDefinition");
+            runTaskRequest.setLaunchType("FARGATE");
             //TODO for each tag, call ECS with: container-image id, bucket, key, tag
             ecsClient.runTask(runTaskRequest);
         }
