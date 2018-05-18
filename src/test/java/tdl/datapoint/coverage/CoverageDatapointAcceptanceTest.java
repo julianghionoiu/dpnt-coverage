@@ -3,7 +3,10 @@ package tdl.datapoint.coverage;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.TemporaryFolder;
 import org.yaml.snakeyaml.Yaml;
@@ -23,7 +26,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 
@@ -39,8 +42,8 @@ public class CoverageDatapointAcceptanceTest {
     private CoverageUploadHandler coverageUploadHandler;
     private SqsEventQueue sqsEventQueue;
     private LocalS3Bucket localS3Bucket;
-    private Stack<CoverageComputedEvent> coverageComputedEvents;
-    private Stack<ProgrammingLanguageDetectedEvent> languageDetectedEvents;
+    private List<CoverageComputedEvent> coverageComputedEvents;
+    private List<ProgrammingLanguageDetectedEvent> languageDetectedEvents;
 
     @Before
     public void setUp() throws EventProcessingException, IOException {
@@ -62,7 +65,7 @@ public class CoverageDatapointAcceptanceTest {
         coverageUploadHandler = new CoverageUploadHandler();
 
         QueueEventHandlers queueEventHandlers = new QueueEventHandlers();
-        coverageComputedEvents = new Stack<>();
+        coverageComputedEvents = new ArrayList<>();
         queueEventHandlers.on(CoverageComputedEvent.class, coverageComputedEvents::add);
         languageDetectedEvents = new Stack<>();
         queueEventHandlers.on(ProgrammingLanguageDetectedEvent.class, languageDetectedEvents::add);
@@ -90,45 +93,44 @@ public class CoverageDatapointAcceptanceTest {
         sqsEventQueue.unsubscribeFromMessages();
     }
 
-    @Ignore("Copied from dpnt-sourcecode")
     @Test
     public void create_repo_and_uploads_commits() throws Exception {
         // Given - The participant produces SRCS files while solving a challenge
-        String challengeId = generateId();
+        String challengeId = "TCH";
         String participantId = generateId();
         String s3destination = String.format("%s/%s/file.srcs", challengeId, participantId);
-        TestSrcsFile srcs1 = new TestSrcsFile("test1.srcs");
-        TestSrcsFile srcs2 = new TestSrcsFile("test2.srcs");
+        TestSrcsFile srcsForTestChallenge = new TestSrcsFile("LangHmmm_R1Cov33_R2Cov44.srcs");
 
         // When - Upload event happens
         coverageUploadHandler.handleRequest(
-                convertToMap(localS3Bucket.putObject(srcs1.asFile(), s3destination)),
+                convertToMap(localS3Bucket.putObject(srcsForTestChallenge.asFile(), s3destination)),
                 NO_CONTEXT);
-
-        // Then - Repo is created with the contents of the SRCS file
         waitForQueueToReceiveEvents();
-        CoverageComputedEvent queueEvent1 = coverageComputedEvents.pop();
-        String repoUrl1 = queueEvent1.getParticipant();
-        assertThat(repoUrl1, allOf(startsWith("file:///"),
-                containsString(challengeId),
-                endsWith(participantId)));
 
-        // When - Another upload event happens
-        coverageUploadHandler.handleRequest(
-                convertToMap(localS3Bucket.putObject(srcs2.asFile(), s3destination)),
-                NO_CONTEXT);
 
-        // Then - The SRCS file is appended to the repo
-        waitForQueueToReceiveEvents();
-        CoverageComputedEvent queueEvent2 = coverageComputedEvents.pop();
-        String repoUrl2 = queueEvent2.getParticipant();
-        assertThat(repoUrl1, equalTo(repoUrl2));
+        // Then - Language detected event should be generated for the challenge
+        assertThat(languageDetectedEvents.size(), equalTo(1));
+        ProgrammingLanguageDetectedEvent languageEvent = languageDetectedEvents.get(0);
+        assertThat(languageEvent.getParticipant(), equalTo(participantId));
+        assertThat(languageEvent.getChallengeId(), equalTo(challengeId));
+        assertThat(languageEvent.getProgrammingLanguage(), equalTo("Hmmm"));
+
+        // Then - Coverage events are computed for the deploy tags
+        assertThat(coverageComputedEvents.size(), equalTo(2));
+        CoverageComputedEvent coverageRound1 = coverageComputedEvents.get(0);
+        assertThat(coverageRound1.getParticipant(), equalTo(participantId));
+        assertThat(coverageRound1.getRoundId(), equalTo(challengeId+"_R1"));
+        assertThat(coverageRound1.getCoverage(), equalTo("33"));
+        CoverageComputedEvent coverageRound2 = coverageComputedEvents.get(0);
+        assertThat(coverageRound2.getParticipant(), equalTo(participantId));
+        assertThat(coverageRound2.getRoundId(), equalTo(challengeId+"_R2"));
+        assertThat(coverageRound2.getCoverage(), equalTo("44"));
     }
 
     //~~~~~~~~~~ Helpers ~~~~~~~~~~~~~`
 
     private static void waitForQueueToReceiveEvents() throws InterruptedException {
-        Thread.sleep(500);
+        Thread.sleep(1000);
     }
 
     private static String generateId() {
@@ -138,19 +140,5 @@ public class CoverageDatapointAcceptanceTest {
     private static Map<String, Object> convertToMap(String json) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, new TypeReference<Map<String, Object>>() {});
-    }
-
-    private static List<String> getCombinedMessages(TestSrcsFile srcs1, TestSrcsFile srcs2) throws IOException {
-        List<String> combinedList = new ArrayList<>();
-        combinedList.addAll(srcs1.getCommitMessages());
-        combinedList.addAll(srcs2.getCommitMessages());
-        return combinedList;
-    }
-
-    private static List<String> getCombinedTags(TestSrcsFile srcs1, TestSrcsFile srcs2) throws IOException {
-        List<String> combinedList = new ArrayList<>();
-        combinedList.addAll(srcs1.getTags());
-        combinedList.addAll(srcs2.getTags());
-        return combinedList;
     }
 }
