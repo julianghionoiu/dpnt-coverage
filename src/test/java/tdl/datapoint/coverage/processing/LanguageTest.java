@@ -25,6 +25,11 @@ public class LanguageTest {
     }
 
     @Test
+    public void should_ignore_spaces_and_capitalisation_when_matching() throws IllegalLanguageException {
+        assertThat(Language.of("  JaVa \n  "), is(JAVA));
+    }
+
+    @Test
     public void should_throw_exception_if_language_not_recognised() throws IllegalLanguageException {
         thrown.expect(IllegalLanguageException.class);
         Language.of("none");

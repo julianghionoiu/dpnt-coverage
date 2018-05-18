@@ -35,9 +35,10 @@ public enum Language {
     }
 
     public static Language of(String text) throws IllegalLanguageException {
+        String trimmedAndLowercaseText = text.trim().toLowerCase();
         return Arrays.stream(Language.values())
-                .filter(language -> language.languageId.equalsIgnoreCase(text) ||
-                        language.alternativeNamesLowercase.contains(text.toLowerCase()))
+                .filter(language -> language.languageId.equals(trimmedAndLowercaseText) ||
+                        language.alternativeNamesLowercase.contains(trimmedAndLowercaseText))
                 .findFirst().orElseThrow(() -> new IllegalLanguageException("Not a valid language:"+text));
     }
 
