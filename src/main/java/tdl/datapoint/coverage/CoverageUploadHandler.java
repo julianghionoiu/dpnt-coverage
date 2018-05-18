@@ -3,6 +3,9 @@ package tdl.datapoint.coverage;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.ecs.AmazonECS;
+import com.amazonaws.services.ecs.AmazonECSAsyncClientBuilder;
+import com.amazonaws.services.ecs.model.RunTaskRequest;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.s3.AmazonS3;
@@ -30,6 +33,7 @@ import static tdl.datapoint.coverage.ApplicationEnv.*;
 public class CoverageUploadHandler implements RequestHandler<Map<String, Object>, String> {
     private static final Logger LOG = Logger.getLogger(CoverageUploadHandler.class.getName());
     private AmazonS3 s3Client;
+    private AmazonECS ecsClient;
     private SqsEventQueue participantEventQueue;
     private S3SrcsToGitExporter srcsToGitExporter;
 
@@ -49,17 +53,22 @@ public class CoverageUploadHandler implements RequestHandler<Map<String, Object>
                 getEnv(S3_ACCESS_KEY),
                 getEnv(S3_SECRET_KEY));
 
+        ecsClient = createECSClient(
+                getEnv(ECS_ENDPOINT),
+                getEnv(ECS_REGION),
+                getEnv(ECS_ACCESS_KEY),
+                getEnv(ECS_SECRET_KEY));
+
         srcsToGitExporter = new S3SrcsToGitExporter();
 
-        AmazonSQS client = createSQSClient(
+        AmazonSQS queueClient = createSQSClient(
                 getEnv(SQS_ENDPOINT),
                 getEnv(SQS_REGION),
                 getEnv(SQS_ACCESS_KEY),
                 getEnv(SQS_SECRET_KEY)
         );
-
         String queueUrl = getEnv(SQS_QUEUE_URL);
-        participantEventQueue = new SqsEventQueue(client, queueUrl);
+        participantEventQueue = new SqsEventQueue(queueClient, queueUrl);
     }
 
     private static AmazonS3 createS3Client(String endpoint, String region, String accessKey, String secretKey) {
@@ -75,6 +84,15 @@ public class CoverageUploadHandler implements RequestHandler<Map<String, Object>
         AwsClientBuilder.EndpointConfiguration endpointConfiguration =
                 new AwsClientBuilder.EndpointConfiguration(serviceEndpoint, signingRegion);
         return AmazonSQSClientBuilder.standard()
+                .withEndpointConfiguration(endpointConfiguration)
+                .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
+                .build();
+    }
+
+    private static AmazonECS createECSClient(String serviceEndpoint, String signingRegion, String accessKey, String secretKey) {
+        AwsClientBuilder.EndpointConfiguration endpointConfiguration =
+                new AwsClientBuilder.EndpointConfiguration(serviceEndpoint, signingRegion);
+        return AmazonECSAsyncClientBuilder.standard()
                 .withEndpointConfiguration(endpointConfiguration)
                 .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
                 .build();
@@ -117,10 +135,19 @@ public class CoverageUploadHandler implements RequestHandler<Map<String, Object>
 
         LOG.info("Identify \"done\" tags");
         List<String> tags = LocalGitClient.getTags(localRepo);
-        LOG.info("Relevant tags"+tags);
+
+        if (tags.isEmpty()) {
+            LOG.info("No tags to process. Exiting");
+            return;
+        } else {
+            LOG.info("Relevant tags"+tags);
+        }
 
         LOG.info("Triggering ECS to process coverage for tags");
-        //TODO for each tag, call ECS with: container-image id, bucket, key, tag ++ credentials for S3 and SQS
+        for (String tag : tags) {
+            RunTaskRequest runTaskRequest = new RunTaskRequest();
+            //TODO for each tag, call ECS with: container-image id, bucket, key, tag
+            ecsClient.runTask(runTaskRequest);
+        }
     }
-
 }

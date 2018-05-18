@@ -6,6 +6,11 @@ public enum ApplicationEnv {
     S3_ACCESS_KEY,
     S3_SECRET_KEY,
 
+    ECS_ENDPOINT,
+    ECS_REGION,
+    ECS_ACCESS_KEY,
+    ECS_SECRET_KEY,
+
     SQS_ENDPOINT,
     SQS_REGION,
     SQS_ACCESS_KEY,
