@@ -13,3 +13,10 @@ Takes in 3 parameters:
 	- repo url i.e.  https://github.com/julianghionoiu/tdl-runner-java.git    
 	- tag name i.e. xxx-2.0
 	- challengeId i.e. HLO
+
+Example:
+    
+    ```
+       cd containers/java 
+       ./fetch_repo_and_collect_coverage.sh https://github.com/julianghionoiu/tdl-runner-java.git xxx-2.0 HLO         
+    ```	
