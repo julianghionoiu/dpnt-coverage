@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static tdl.datapoint.coverage.ApplicationEnv.*;
 
@@ -139,18 +140,21 @@ public class CoverageUploadHandler implements RequestHandler<Map<String, Object>
         LOG.info("Language identified as: "+language.getLanguageId());
 
         LOG.info("Identify \"done\" tags");
-        List<String> tags = LocalGitClient.getTags(localRepo);
-
-        if (tags.isEmpty()) {
+        List<String> doneTags = LocalGitClient.getTags(localRepo).stream()
+                .filter(s -> s.startsWith(challengeId))
+                .filter(s -> s.endsWith("/done"))
+                .collect(Collectors.toList());
+        if (doneTags.isEmpty()) {
             LOG.info("No tags to process. Exiting");
             return;
         } else {
-            LOG.info("Relevant tags"+tags);
+            LOG.info("Relevant tags "+doneTags);
         }
 
         LOG.info("Triggering ECS to process coverage for tags");
-        for (String tag : tags) {
-            ecsCoverageTaskRunner.runCoverageTask(language, tag);
+        for (String doneTag : doneTags) {
+            ecsCoverageTaskRunner.runCoverageTask(event.getBucket(), event.getKey(),
+                    language, challengeId, doneTag);
         }
     }
 

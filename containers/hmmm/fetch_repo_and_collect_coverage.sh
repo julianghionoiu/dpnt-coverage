@@ -5,6 +5,8 @@ set -e
 set -u
 set -o pipefail
 
+LOCAL_REPO_DESTINATION="./tdl-runner"
+
 # To check if an ENV variable exists, we dereference the input string $1 -> !1
 # then then we attempt parameter expansion with the "+x" string
 # it should return an empty string if ENV not defined
@@ -17,11 +19,23 @@ ensure_env "REPO"
 ensure_env "TAG"
 ensure_env "CHALLENGE_ID"
 
+
+
+
 # Clone and switch to TAG
-git clone ${REPO} tdl-runner
-cd tdl-runner
-git checkout ${TAG}
-git pull origin ${TAG}
+if [[ "$REPO" == *s3:// ]];
+then
+    echo "S3 based SRCS file detected"
+
+
+else
+    echo "Assuming Git repo"
+    git clone ${REPO} ${LOCAL_REPO_DESTINATION}
+    cd ${LOCAL_REPO_DESTINATION}
+    git checkout ${TAG}
+    git pull origin ${TAG}
+fi
+
 
 # Run the coverage
 echo  "~~~~~~ START run external script ~~~~~~" > /dev/null
