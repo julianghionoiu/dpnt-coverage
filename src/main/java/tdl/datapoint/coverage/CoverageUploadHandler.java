@@ -5,9 +5,6 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.ecs.AmazonECS;
 import com.amazonaws.services.ecs.AmazonECSAsyncClientBuilder;
-import com.amazonaws.services.ecs.model.AwsVpcConfiguration;
-import com.amazonaws.services.ecs.model.NetworkConfiguration;
-import com.amazonaws.services.ecs.model.RunTaskRequest;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.s3.AmazonS3;
@@ -16,16 +13,12 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import org.eclipse.jgit.api.Git;
-import tdl.datapoint.coverage.processing.Language;
-import tdl.datapoint.coverage.processing.LocalGitClient;
-import tdl.datapoint.coverage.processing.S3BucketEvent;
-import tdl.datapoint.coverage.processing.S3SrcsToGitExporter;
+import tdl.datapoint.coverage.processing.*;
 import tdl.participant.queue.connector.SqsEventQueue;
 import tdl.participant.queue.events.ProgrammingLanguageDetectedEvent;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -39,6 +32,7 @@ public class CoverageUploadHandler implements RequestHandler<Map<String, Object>
     private AmazonECS ecsClient;
     private SqsEventQueue participantEventQueue;
     private S3SrcsToGitExporter srcsToGitExporter;
+    private final ECSCoverageTaskRunner ecsCoverageTaskRunner;
 
     private static String getEnv(ApplicationEnv key) {
         String env = System.getenv(key.name());
@@ -61,6 +55,14 @@ public class CoverageUploadHandler implements RequestHandler<Map<String, Object>
                 getEnv(ECS_REGION),
                 getEnv(ECS_ACCESS_KEY),
                 getEnv(ECS_SECRET_KEY));
+
+        ecsCoverageTaskRunner = new ECSCoverageTaskRunner(ecsClient,
+                getEnv(ECS_TASK_CLUSTER),
+                getEnv(ECS_TASK_DEFINITION_PREFIX),
+                getEnv(ECS_TASK_LAUNCH_TYPE),
+                getEnv(ECS_VPC_SUBNET),
+                getEnv(ECS_VPC_SECURITY_GROUP),
+                getEnv(ECS_VPC_ASSIGN_PUBLIC_IP));
 
         srcsToGitExporter = new S3SrcsToGitExporter();
 
@@ -148,24 +150,9 @@ public class CoverageUploadHandler implements RequestHandler<Map<String, Object>
 
         LOG.info("Triggering ECS to process coverage for tags");
         for (String tag : tags) {
-            runCoverageTask(ecsClient, language, tag);
+            ecsCoverageTaskRunner.runCoverageTask(language, tag);
         }
     }
 
-    private static void runCoverageTask(AmazonECS ecsClient, Language language, String tag) {
-        RunTaskRequest runTaskRequest = new RunTaskRequest();
-        runTaskRequest.setCluster("local-test-cluster");
-        runTaskRequest.setTaskDefinition("accelerate-io/dpnt-coverage-"+language.getLanguageId());
-        runTaskRequest.setLaunchType("FARGATE");
 
-        NetworkConfiguration networkConfiguration = new NetworkConfiguration();
-        AwsVpcConfiguration awsvpcConfiguration = new AwsVpcConfiguration();
-        awsvpcConfiguration.setSubnets(Collections.singletonList("local-subnet-x"));
-        awsvpcConfiguration.setSecurityGroups(Collections.singletonList("sg-local-security"));
-        awsvpcConfiguration.setAssignPublicIp("DISABLED");
-
-        networkConfiguration.setAwsvpcConfiguration(awsvpcConfiguration);
-        runTaskRequest.setNetworkConfiguration(networkConfiguration);
-        ecsClient.runTask(runTaskRequest);
-    }
 }
