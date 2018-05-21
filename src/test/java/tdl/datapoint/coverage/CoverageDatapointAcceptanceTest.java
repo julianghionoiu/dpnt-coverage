@@ -130,7 +130,7 @@ public class CoverageDatapointAcceptanceTest {
     //~~~~~~~~~~ Helpers ~~~~~~~~~~~~~`
 
     private static void waitForQueueToReceiveEvents() throws InterruptedException {
-        Thread.sleep(1000);
+        Thread.sleep(10000);
     }
 
     private static String generateId() {

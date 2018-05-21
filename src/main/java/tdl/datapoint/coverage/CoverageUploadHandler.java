@@ -5,6 +5,8 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.ecs.AmazonECS;
 import com.amazonaws.services.ecs.AmazonECSAsyncClientBuilder;
+import com.amazonaws.services.ecs.model.AwsVpcConfiguration;
+import com.amazonaws.services.ecs.model.NetworkConfiguration;
 import com.amazonaws.services.ecs.model.RunTaskRequest;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
@@ -23,6 +25,7 @@ import tdl.participant.queue.events.ProgrammingLanguageDetectedEvent;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -145,11 +148,24 @@ public class CoverageUploadHandler implements RequestHandler<Map<String, Object>
 
         LOG.info("Triggering ECS to process coverage for tags");
         for (String tag : tags) {
-            RunTaskRequest runTaskRequest = new RunTaskRequest();
-            runTaskRequest.setTaskDefinition("myTaskDefinition");
-            runTaskRequest.setLaunchType("FARGATE");
-            //TODO for each tag, call ECS with: container-image id, bucket, key, tag
-            ecsClient.runTask(runTaskRequest);
+            runCoverageTask(ecsClient, language, tag);
         }
+    }
+
+    private static void runCoverageTask(AmazonECS ecsClient, Language language, String tag) {
+        RunTaskRequest runTaskRequest = new RunTaskRequest();
+        runTaskRequest.setCluster("local-test-cluster");
+        runTaskRequest.setTaskDefinition("accelerate-io/dpnt-coverage-"+language.getLanguageId());
+        runTaskRequest.setLaunchType("FARGATE");
+
+        NetworkConfiguration networkConfiguration = new NetworkConfiguration();
+        AwsVpcConfiguration awsvpcConfiguration = new AwsVpcConfiguration();
+        awsvpcConfiguration.setSubnets(Collections.singletonList("local-subnet-x"));
+        awsvpcConfiguration.setSecurityGroups(Collections.singletonList("sg-local-security"));
+        awsvpcConfiguration.setAssignPublicIp("DISABLED");
+
+        networkConfiguration.setAwsvpcConfiguration(awsvpcConfiguration);
+        runTaskRequest.setNetworkConfiguration(networkConfiguration);
+        ecsClient.runTask(runTaskRequest);
     }
 }
