@@ -16,5 +16,5 @@ out
 node_modules
 
 tmp
-config/env.dev.yml
-config/env.live.yml
+config/live*
+config/dev*

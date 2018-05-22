@@ -12,7 +12,7 @@ provider:
     memorySize: 1536 # in MB
     timeout: 120 # in seconds
     versionFunctions: false
-    environment: ${file(config/env.${self:provider.stage}.yml)}
+    environment: ${file(config/${self:provider.stage}.lambda.yml)}
 
 package:
     artifact: build/libs/dpnt-coverage-all.jar

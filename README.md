@@ -9,7 +9,7 @@ Collect coverage from SRCS files
 Start external dependencies
 ```bash
 python local-sqs/elasticmq-wrapper.py start
-python local-ecs/ecs-server-wrapper.py start
+python local-ecs/ecs-server-wrapper.py start config/local.ecstask.json
 python local-s3/minio-wrapper.py start
 ```
 

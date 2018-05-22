@@ -10,6 +10,6 @@ ECS_VPC_SUBNET: "local-subnet-x"
 ECS_VPC_SECURITY_GROUP: "sg-local-security"
 ECS_VPC_ASSIGN_PUBLIC_IP: "DISABLED"
 
-SQS_ENDPOINT: "http://localhost:9324"
+SQS_ENDPOINT: "http://127.0.0.1:9324"
 SQS_REGION: "elasticmq"
-SQS_QUEUE_URL: "http://localhost:9324/queue/participant-events"
+SQS_QUEUE_URL: "http://127.0.0.1:9324/queue/participant-events"
