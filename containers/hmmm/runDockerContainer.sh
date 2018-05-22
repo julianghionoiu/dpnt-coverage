@@ -19,6 +19,11 @@ ${SCRIPT_CURRENT_DIR}/buildDockerImage.sh "${dockerImageName}" "${dockerImageVer
 echo "Running ${dockerImageName}":"${dockerImageVersion} from the local docker registry"
 docker run                                                                      \
       --rm                                                                      \
+      --env S3_ENDPOINT=unused                                                  \
+      --env S3_REGION=unused                                                    \
+      --env SQS_ENDPOINT=unused                                                 \
+      --env SQS_REGION=unused                                                   \
+      --env SQS_QUEUE_URL=unused                                                \
       --env REPO=${REPO}                                                        \
       --env TAG=${TAG}                                                          \
       --env CHALLENGE_ID=${CHALLENGE_ID}                                        \
