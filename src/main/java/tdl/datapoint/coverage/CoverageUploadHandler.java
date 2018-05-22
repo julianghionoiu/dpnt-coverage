@@ -1,7 +1,6 @@
 package tdl.datapoint.coverage;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.ecs.AmazonECS;
 import com.amazonaws.services.ecs.AmazonECSAsyncClientBuilder;
@@ -47,15 +46,11 @@ public class CoverageUploadHandler implements RequestHandler<Map<String, Object>
     public CoverageUploadHandler() {
         s3Client = createS3Client(
                 getEnv(S3_ENDPOINT),
-                getEnv(S3_REGION),
-                getEnv(S3_ACCESS_KEY),
-                getEnv(S3_SECRET_KEY));
+                getEnv(S3_REGION));
 
         ecsClient = createECSClient(
                 getEnv(ECS_ENDPOINT),
-                getEnv(ECS_REGION),
-                getEnv(ECS_ACCESS_KEY),
-                getEnv(ECS_SECRET_KEY));
+                getEnv(ECS_REGION));
 
         ecsCoverageTaskRunner = new ECSCoverageTaskRunner(ecsClient,
                 getEnv(ECS_TASK_CLUSTER),
@@ -69,38 +64,35 @@ public class CoverageUploadHandler implements RequestHandler<Map<String, Object>
 
         AmazonSQS queueClient = createSQSClient(
                 getEnv(SQS_ENDPOINT),
-                getEnv(SQS_REGION),
-                getEnv(SQS_ACCESS_KEY),
-                getEnv(SQS_SECRET_KEY)
+                getEnv(SQS_REGION)
         );
         String queueUrl = getEnv(SQS_QUEUE_URL);
         participantEventQueue = new SqsEventQueue(queueClient, queueUrl);
     }
 
-    private static AmazonS3 createS3Client(String endpoint, String region, String accessKey, String secretKey) {
+    private static AmazonS3 createS3Client(String endpoint, String region) {
         AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard();
         builder = builder.withPathStyleAccessEnabled(true)
                 .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint, region))
-                .withCredentials(new AWSStaticCredentialsProvider(
-                        new BasicAWSCredentials(accessKey, secretKey)));
+                .withCredentials(new DefaultAWSCredentialsProviderChain());
         return builder.build();
     }
 
-    private static AmazonSQS createSQSClient(String serviceEndpoint, String signingRegion, String accessKey, String secretKey) {
+    private static AmazonSQS createSQSClient(String serviceEndpoint, String signingRegion) {
         AwsClientBuilder.EndpointConfiguration endpointConfiguration =
                 new AwsClientBuilder.EndpointConfiguration(serviceEndpoint, signingRegion);
         return AmazonSQSClientBuilder.standard()
                 .withEndpointConfiguration(endpointConfiguration)
-                .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
+                .withCredentials(new DefaultAWSCredentialsProviderChain())
                 .build();
     }
 
-    private static AmazonECS createECSClient(String serviceEndpoint, String signingRegion, String accessKey, String secretKey) {
+    private static AmazonECS createECSClient(String serviceEndpoint, String signingRegion) {
         AwsClientBuilder.EndpointConfiguration endpointConfiguration =
                 new AwsClientBuilder.EndpointConfiguration(serviceEndpoint, signingRegion);
         return AmazonECSAsyncClientBuilder.standard()
                 .withEndpointConfiguration(endpointConfiguration)
-                .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
+                .withCredentials(new DefaultAWSCredentialsProviderChain())
                 .build();
     }
 

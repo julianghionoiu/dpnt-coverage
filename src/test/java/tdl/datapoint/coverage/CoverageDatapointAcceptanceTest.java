@@ -47,19 +47,17 @@ public class CoverageDatapointAcceptanceTest {
 
     @Before
     public void setUp() throws EventProcessingException, IOException {
+        environmentVariables.set("AWS_ACCESS_KEY_ID","local_test_access_key");
+        environmentVariables.set("AWS_SECRET_KEY","local_test_secret_key");
         setEnvFrom(Paths.get("config", "env.local.yml"));
 
         localS3Bucket = LocalS3Bucket.createInstance(
                 getEnv(ApplicationEnv.S3_ENDPOINT),
-                getEnv(ApplicationEnv.S3_REGION),
-                getEnv(ApplicationEnv.S3_ACCESS_KEY),
-                getEnv(ApplicationEnv.S3_SECRET_KEY));
+                getEnv(ApplicationEnv.S3_REGION));
 
         sqsEventQueue = LocalSQSQueue.createInstance(
                 getEnv(ApplicationEnv.SQS_ENDPOINT),
                 getEnv(ApplicationEnv.SQS_REGION),
-                getEnv(ApplicationEnv.SQS_ACCESS_KEY),
-                getEnv(ApplicationEnv.SQS_SECRET_KEY),
                 getEnv(ApplicationEnv.SQS_QUEUE_URL));
 
         coverageUploadHandler = new CoverageUploadHandler();
@@ -88,6 +86,7 @@ public class CoverageDatapointAcceptanceTest {
 
         values.forEach((key, value) -> environmentVariables.set(key, value));
     }
+
     @After
     public void tearDown() throws Exception {
         sqsEventQueue.unsubscribeFromMessages();
