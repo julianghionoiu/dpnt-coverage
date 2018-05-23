@@ -6,11 +6,22 @@ Collect coverage from SRCS files
 
 ## Acceptance test
 
-Start external dependencies
+Start the local S3 and SQS simulators
 ```bash
 python local-sqs/elasticmq-wrapper.py start
-python local-ecs/ecs-server-wrapper.py start config/local.ecstask.json
 python local-s3/minio-wrapper.py start
+```
+
+We use the `hmmm` language to test the application.
+The language container image needs to be build and tagged as `latest`:
+```
+./containers/buildDockerImage.sh hmmm
+./containers/makeLatest.sh hmmm
+```
+
+Start the local ECS simulator. The simulator will use the containers available in the local Docker registry.
+```bash
+python local-ecs/ecs-server-wrapper.py start config/local.ecstask.json
 ```
 
 Run the acceptance test
@@ -19,7 +30,7 @@ Run the acceptance test
 ./gradlew --rerun-tasks test jacocoTestReport
 ```
 
-Stop external dependencies
+Stop dependencies
 ```bash
 python local-sqs/elasticmq-wrapper.py stop
 python local-ecs/ecs-server-wrapper.py stop
