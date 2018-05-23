@@ -15,8 +15,8 @@ python local-s3/minio-wrapper.py start
 We use the `hmmm` language to test the application.
 The language container image needs to be build and tagged as `latest`:
 ```
-./containers/buildDockerImage.sh hmmm
-./containers/makeLatest.sh hmmm
+./container/buildDockerImage.sh hmmm
+./container/makeLatest.sh hmmm
 ```
 
 Start the local ECS simulator. The simulator will use the containers available in the local Docker registry.

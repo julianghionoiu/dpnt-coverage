@@ -18,6 +18,6 @@ ENV INTEROP_QUEUE_VERSION 0.1.18
 RUN wget https://github.com/julianghionoiu/tdl-interop-event-queue/releases/download/v${INTEROP_QUEUE_VERSION}/queue-cli-tool-${INTEROP_QUEUE_VERSION}-all.jar \
     -O ./queue-cli-tool-all.jar
 
-COPY ./fetch_repo_and_collect_coverage.sh .
+COPY fetch_repo_and_collect_coverage.sh .
 
 ENTRYPOINT ./fetch_repo_and_collect_coverage.sh
