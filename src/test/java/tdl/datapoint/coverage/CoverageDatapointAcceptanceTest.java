@@ -109,6 +109,7 @@ public class CoverageDatapointAcceptanceTest {
 
         // Then - Language detected event should be generated for the challenge
         assertThat(languageDetectedEvents.size(), equalTo(1));
+        System.out.println("Received language detected events: "+languageDetectedEvents);
         ProgrammingLanguageDetectedEvent languageEvent = languageDetectedEvents.get(0);
         assertThat(languageEvent.getParticipant(), equalTo(participantId));
         assertThat(languageEvent.getChallengeId(), equalTo(challengeId));
@@ -116,14 +117,16 @@ public class CoverageDatapointAcceptanceTest {
 
         // Then - Coverage events are computed for the deploy tags
         assertThat(coverageComputedEvents.size(), equalTo(2));
+        System.out.println("Received coverage events: "+coverageComputedEvents);
+        coverageComputedEvents.sort(Comparator.comparing(CoverageComputedEvent::getRoundId));
         CoverageComputedEvent coverageRound1 = coverageComputedEvents.get(0);
         assertThat(coverageRound1.getParticipant(), equalTo(participantId));
         assertThat(coverageRound1.getRoundId(), equalTo(challengeId+"_R1"));
-        assertThat(coverageRound1.getCoverage(), equalTo("33"));
-        CoverageComputedEvent coverageRound2 = coverageComputedEvents.get(0);
+        assertThat(coverageRound1.getCoverage(), equalTo(33));
+        CoverageComputedEvent coverageRound2 = coverageComputedEvents.get(1);
         assertThat(coverageRound2.getParticipant(), equalTo(participantId));
         assertThat(coverageRound2.getRoundId(), equalTo(challengeId+"_R2"));
-        assertThat(coverageRound2.getCoverage(), equalTo("44"));
+        assertThat(coverageRound2.getCoverage(), equalTo(44));
     }
 
     //~~~~~~~~~~ Helpers ~~~~~~~~~~~~~`

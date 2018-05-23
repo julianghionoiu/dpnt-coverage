@@ -145,8 +145,9 @@ public class CoverageUploadHandler implements RequestHandler<Map<String, Object>
 
         LOG.info("Triggering ECS to process coverage for tags");
         for (String doneTag : doneTags) {
+            String roundId = doneTag.split("/")[0];
             ecsCoverageTaskRunner.runCoverageTask(event.getBucket(), event.getKey(),
-                    language, challengeId, doneTag);
+                    participantId, challengeId, roundId, language, doneTag);
         }
     }
 

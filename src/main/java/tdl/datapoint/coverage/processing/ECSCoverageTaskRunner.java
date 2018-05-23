@@ -40,11 +40,15 @@ public class ECSCoverageTaskRunner {
         };
     }
 
-    public void runCoverageTask(String bucket, String key, Language language, String challengeId, String tag) {
+    public void runCoverageTask(String bucket, String key, String participantId,
+                                String challengeId, String roundId,
+                                Language language, String tag) {
         RunTaskRequest runTaskRequest = runTaskRequestSupplier.get();
         runTaskRequest.setTaskDefinition(this.taskDefinitionPrefix+language.getLanguageId());
 
         HashMap<String, String> env = new HashMap<>();
+        env.put("PARTICIPANT_ID", participantId);
+        env.put("ROUND_ID", roundId);
         env.put("REPO", "s3://" + bucket + "/" + key);
         env.put("TAG", tag);
         env.put("CHALLENGE_ID", challengeId);
