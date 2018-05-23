@@ -6,21 +6,25 @@ set -o pipefail
 
 SCRIPT_CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-[ "$#" -eq 4 ] || echo >&2 "Usage: $0 PARTICIPANT_ID ROUND_ID REPO TAG CHALLENGE_ID"
-PARTICIPANT_ID=$1
-ROUND_ID=$2
-REPO=$3
-TAG=$4
-CHALLENGE_ID=$5
+function die() { echo >&2 $1; exit 1; }
+[ "$#" -eq 6 ] || die "Usage: $0 LANGUAGE_ID PARTICIPANT_ID ROUND_ID REPO TAG CHALLENGE_ID"
+LANGUAGE_ID=$1
+PARTICIPANT_ID=$2
+ROUND_ID=$3
+REPO=$4
+TAG=$5
+CHALLENGE_ID=$6
 
-dockerImageName="accelerate-io/dpnt-coverage-hmmm"
-dockerImageVersion="0.1"
+echo "Compute language specific name+version"
+DEFAULT_IMAGE_PREFIX="accelerate-io/dpnt-coverage-"
+language_image_version=$( cat "${SCRIPT_CURRENT_DIR}/${LANGUAGE_ID}/version.txt" | tr -d " " | tr -d "\n" )
+language_image_name="${DEFAULT_IMAGE_PREFIX}${LANGUAGE_ID}"
+language_image_tag="${language_image_name}:${language_image_version}"
 
-echo "Quickly triggering a re-build of the docker image '${dockerImageName}":"${dockerImageVersion}'"
-${SCRIPT_CURRENT_DIR}/buildDockerImage.sh "${dockerImageName}" "${dockerImageVersion}"
-
-echo "Running ${dockerImageName}":"${dockerImageVersion} from the local docker registry"
+echo "Running ${language_image_tag} from the local docker registry"
 docker run                                                                      \
+      --env AWS_ACCESS_KEY_ID=unused                                            \
+      --env AWS_SECRET_KEY=unused                                               \
       --env S3_ENDPOINT=unused                                                  \
       --env S3_REGION=unused                                                    \
       --env SQS_ENDPOINT=unused                                                 \
@@ -31,4 +35,4 @@ docker run                                                                      
       --env REPO=${REPO}                                                        \
       --env TAG=${TAG}                                                          \
       --env CHALLENGE_ID=${CHALLENGE_ID}                                        \
-      ${dockerImageName}:${dockerImageVersion}
+      ${language_image_tag}
