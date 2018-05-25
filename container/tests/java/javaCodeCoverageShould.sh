@@ -18,7 +18,7 @@ computeCoverageForChallenge() {
    fi
 
    # when
-   actualResult=$(cd ../.. && ./runDockerContainer.sh ${language_id} ${participant_id} ${round_id} ${repo} ${tag} ${challenge_id})
+   actualResult=$( cd ../.. && ./runDockerContainer.sh ${language_id} ${participant_id} ${round_id} ${repo} ${tag} ${challenge_id} | tail -1 )
 
    # then
    exitCode=$?
