@@ -1,37 +1,10 @@
 [
   {
-    "ParameterKey": "S3_ENDPOINT",
-    "ParameterValue": "http://host.docker.internal:9000"
+    "ParameterKey": "X_KEY",
+    "ParameterValue": "x"
   },
   {
-    "ParameterKey": "S3_REGION",
-    "ParameterValue": "us-east-1"
-  },
-
-  {
-    "ParameterKey": "SQS_ENDPOINT",
-    "ParameterValue": "http://host.docker.internal:9324"
-  },
-  {
-    "ParameterKey": "SQS_REGION",
-    "ParameterValue": "elasticmq"
-  },
-  {
-    "ParameterKey": "SQS_QUEUE_URL",
-    "ParameterValue": "http://host.docker.internal:9324/queue/participant-events"
-  },
-
-
-  {
-    "ParameterKey": "LocalOnlyBeyondThisPoint",
-    "ParameterValue": "ignore"
-  },
-  {
-    "ParameterKey": "AWS_ACCESS_KEY_ID",
-    "ParameterValue": "local_test_access_key"
-  },
-  {
-    "ParameterKey": "AWS_SECRET_ACCESS_KEY",
-    "ParameterValue": "local_test_secret_key"
+    "ParameterKey": "Y_KEY",
+    "ParameterValue": "y"
   }
 ]
