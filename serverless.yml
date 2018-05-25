@@ -62,6 +62,11 @@ provider:
        - "iam:PassRole"
       Resource:
        - "arn:aws:iam::577770582757:role/ecsTaskExecutionRole"
+       - Fn::Join:
+         - ""
+         - - "arn:aws:iam::577770582757:role/"
+           - ${self:provider.environment.ECS_TASK_CLUSTER}
+           - "-taskRole"
 
 package:
   artifact: build/libs/dpnt-coverage-all.jar

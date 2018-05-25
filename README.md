@@ -58,10 +58,21 @@ Invoke function manually
 SLS_DEBUG=* serverless invoke local --function srcs-github-export --path tdl/dpnt-sourcecode/src/test/resources/tdl/datapoint/sourcecode/sample_s3_event.json
 ```
 
-## Remote deployment
+## Container deployment
 
-Build all container images.
-Push images to ECR.
+See the AWS ECR registry instructions on how to deploy a container into AWS
+
+
+## Cluster deployment
+
+Define an environment by dupicating the configuration file in `./config`
+
+Trigger AWS CloudFormation to deploy or update an ECS Cluster
+```
+./ecs-cluster-definition/deploy.sh dev
+```
+
+## Lambda deployment
 
 Build package
 ```
@@ -84,8 +95,9 @@ Create an S3 event json and place it in a temp folder, say `xyz/s3_event.json`
 Set the bucket and the key to some meaningful values.
 
 Invoke the dev lambda
-
 ```
 SLS_DEBUG=* serverless invoke --stage dev --function call-ecs-to-compute-coverage --path src/test/resources/tdl/datapoint/coverage/sample_s3_event.json
 ```
 
+Check the destination queue for that particular environment.
+Check the ECS Task status and logs
