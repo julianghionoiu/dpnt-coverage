@@ -21,11 +21,6 @@ The `base` image version is injected into the language specific images via the u
 
 The `latest` tag has a special meaning and it is used by the ECS local simulator to match the Docker container to be run.
 
-If you want your container to be picked up and used by the ECS Task Run:
-```
-./makeLatest <language_id>
-```
-
 ## Running
 
 In a nutshell the container operate in 3 steps:
