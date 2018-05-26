@@ -15,7 +15,7 @@ computeCoverageForChallenge() {
    round_id="round"
 
    dockerImagePresent=$(docker images -q -f reference=accelerate-io/dpnt-coverage-${language_id}:latest)
-   if [[ -z "${dockerImagePresent}" ]] || [[ $? -ne 0 ]]; then
+   if [[ -z "${dockerImagePresent}" ]]; then
       echo "Test failed during setup, due to failing to find docker image for ${language_id} language" 1>&2
       testOutcome "Failed" "${language_id}" "${challenge_id}" "${participant_id}" "${round_id}"
       return
@@ -26,9 +26,7 @@ computeCoverageForChallenge() {
 
    # then
    exitCode=$?
-   if [[ ${exitCode} -eq 0 ]]; then
-      echo "Test passed"
-   else
+   if [[ ${exitCode} -ne 0 ]]; then
       echo "Test failed due to exit code mismatch" 1>&2
       echo "   Actual exit code: ${exitCode}"      1>&2
       echo "   Expected exit code: 0"              1>&2
