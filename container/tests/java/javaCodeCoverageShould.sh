@@ -23,11 +23,12 @@ computeCoverageForChallenge() {
 
    # when
    actualResult=$( . ${SCRIPT_CURRENT_DIR}/../../runDockerContainer.sh ${language_id} ${participant_id} ${round_id} ${repo} ${tag} ${challenge_id} | tail -1 )
+   actualResult=$(echo ${actualResult} | awk '{print coverage, $3}' | tr '="' ' ' | awk '{print $2}')
 
    # then
    exitCode=$?
    if [[ ${exitCode} -ne 0 ]]; then
-      echo "Test failed due to exit code mismatch" 1>&2
+      echo "Test failed due to non-zero exit code" 1>&2
       echo "   Actual exit code: ${exitCode}"      1>&2
       echo "   Expected exit code: 0"              1>&2
    fi
