@@ -52,9 +52,9 @@ testOutcome() {
     round_id="$5"
 
     if [[ "${outcome}" = "Passed" ]]; then
-        passedTests+=("${language_id}|${challenge_id}|${participant_id}|${round_id}")
+        passedTests+=("language=${language_id}|challenge=${challenge_id}|participant=${participant_id}|round=${round_id}")
     elif [[ "${outcome}" = "Failed" ]]; then
-        failedTests+=("${language_id}|${challenge_id}|${participant_id}|${round_id}")
+        failedTests+=("language=${language_id}|challenge=${challenge_id}|participant=${participant_id}|round=${round_id}")
     fi
 }
 
