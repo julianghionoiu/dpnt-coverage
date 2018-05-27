@@ -21,7 +21,14 @@ The language container image needs to be build and tagged as `latest`:
 
 Start the local ECS simulator. The simulator will use the containers available in the local Docker registry.
 ```bash
-python local-ecs/ecs-server-wrapper.py start config/local.ecstask.json
+python local-ecs/ecs-server-wrapper.py start config/local.params.yml
+```
+
+A note on the container networking. The container will attempt to call sevices on the docker host by using the `host.docker.internal` name.
+https://docs.docker.com/docker-for-mac/networking/#use-cases-and-workarounds
+If this is not supported on your machine, you have the option of changing the hostname used to locate the Docker host:
+```bash
+DOCKER_HOST_WITHIN_CONTAINER=host.docker.internal python local-ecs/ecs-server-wrapper.py start config/local.params.yml
 ```
 
 Run the acceptance test
