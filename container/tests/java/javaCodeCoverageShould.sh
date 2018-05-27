@@ -77,7 +77,7 @@ displayPassFailSummary(){
     echo "  ${#failedTests[@]} test(s) failed"
 }
 
-computeCoverageForChallenge "java" "adjust-script-to-run-with-new-changes" "SUM" "100"
-computeCoverageForChallenge "java" "adjust-script-to-run-with-new-changes" "CHK" "0"
+computeCoverageForChallenge "java" "master" "SUM" "100"
+computeCoverageForChallenge "java" "master" "CHK" "0"
 
 displayPassFailSummary
