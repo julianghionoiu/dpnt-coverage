@@ -49,7 +49,7 @@ public class CoverageDatapointAcceptanceTest {
     public void setUp() throws EventProcessingException, IOException {
         environmentVariables.set("AWS_ACCESS_KEY_ID","local_test_access_key");
         environmentVariables.set("AWS_SECRET_KEY","local_test_secret_key");
-        setEnvFrom(environmentVariables, Paths.get("config", "local.lambda.yml"));
+        setEnvFrom(environmentVariables, Paths.get("config", "local.params.yml"));
 
         localS3Bucket = LocalS3Bucket.createInstance(
                 getEnv(ApplicationEnv.S3_ENDPOINT),
