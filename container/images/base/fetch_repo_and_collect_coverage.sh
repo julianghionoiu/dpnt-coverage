@@ -15,12 +15,12 @@ function ensure_env {
 
 WORK_DIR=`pwd`
 
-ensure_env "S3Endpoint"
-ensure_env "S3Region"
+ensure_env "S3_ENDPOINT"
+ensure_env "S3_REGION"
 
-ensure_env "SQSEndpoint"
-ensure_env "SQSRegion"
-ensure_env "SQSQueueUrl"
+ensure_env "SQS_ENDPOINT"
+ensure_env "SQS_REGION"
+ensure_env "SQS_QUEUE_URL"
 
 ensure_env "PARTICIPANT_ID"
 ensure_env "ROUND_ID"
@@ -33,8 +33,8 @@ LOCAL_REPO_DESTINATION="${WORK_DIR}/tdl-runner"
 if [[ "${REPO}" == s3://* ]]; then
     echo "S3 based SRCS file detected"
     local_srcs_file="${WORK_DIR}/file.srcs"
-    aws s3  --endpoint-url ${S3Endpoint} \
-            --region ${S3Region} \
+    aws s3  --endpoint-url ${S3_ENDPOINT} \
+            --region ${S3_REGION} \
             cp ${REPO} ${local_srcs_file}
     java -jar "${WORK_DIR}/dev-sourcecode-record-all.jar" export \
         --input ${local_srcs_file} \
@@ -62,8 +62,8 @@ COVERAGE_FILE="${LOCAL_REPO_DESTINATION}/coverage.tdl"
 echo  "~~~~~~ Publish results ~~~~~~" > /dev/null
 coverage_value=$(cat "${COVERAGE_FILE}" | tr -d " " | tr -d "\n")
 
-if [[ "${SQSQueueUrl}" != http* ]]; then
-    echo "SQSQueueUrl does not seem to be valid. Will print to the console and exit" > /dev/null
+if [[ "${SQS_QUEUE_URL}" != http* ]]; then
+    echo "SQS_QUEUE_URL does not seem to be valid. Will print to the console and exit" > /dev/null
     echo "participant=${PARTICIPANT_ID} roundId=${ROUND_ID} coverage=${coverage_value}"
     exit 0
 fi
@@ -72,9 +72,9 @@ echo "Publish coverage to interop event queue" > /dev/null
 INTEROP_QUEUE_CONFIG="${WORK_DIR}/sqs_queue.conf"
 cat > ${INTEROP_QUEUE_CONFIG} <<EOL
 sqs {
-  serviceEndpoint = "${SQSEndpoint}"
-  signingRegion = "${SQSRegion}"
-  queueUrl = "${SQSQueueUrl}"
+  serviceEndpoint = "${SQS_ENDPOINT}"
+  signingRegion = "${SQS_REGION}"
+  queueUrl = "${SQS_QUEUE_URL}"
 }
 EOL
 cat ${INTEROP_QUEUE_CONFIG}

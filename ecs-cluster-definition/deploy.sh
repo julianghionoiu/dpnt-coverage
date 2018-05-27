@@ -14,11 +14,12 @@ STAGE=$1
 STACK_NAME="dpnt-coverage-ecs-cluster-${STAGE}"
 STACK_REGION="eu-west-1"
 BUILD_DIR="${SCRIPT_CURRENT_DIR}/.build"
-TEMPLATE_FILE="${BUILD_DIR}/cloudformation-template-ecs-cluster.json"
-PARAMETERS_FILE="${SCRIPT_CURRENT_DIR}/../config/${STAGE}.ecstask.json"
+
+PARAMETERS_FILE="${SCRIPT_CURRENT_DIR}/../config/${STAGE}.params.yml"
+TEMPLATE_FILE="${BUILD_DIR}/cloudformation-template-ecs-cluster-${STAGE}.json"
 
 echo "Compile cloudformation template" > /dev/null
-python ${SCRIPT_CURRENT_DIR}/compile_cf_template.py ${TEMPLATE_FILE}
+python ${SCRIPT_CURRENT_DIR}/compile_cf_template.py ${STAGE} ${PARAMETERS_FILE} ${TEMPLATE_FILE}
 
 echo "Sanity check the template" > /dev/null
 aws cloudformation validate-template \
@@ -38,10 +39,7 @@ aws cloudformation update-stack \
     --stack-name ${STACK_NAME} \
     --region ${STACK_REGION} \
     --template-body "file://${TEMPLATE_FILE}" \
-    --parameters "file://${PARAMETERS_FILE}" \
     --capabilities CAPABILITY_NAMED_IAM
-
-
 
 echo "Wait for stack to complete the update" > /dev/null
 aws cloudformation wait stack-update-complete \
