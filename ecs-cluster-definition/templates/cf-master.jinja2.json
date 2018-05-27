@@ -1,0 +1,108 @@
+{% import 'task-definition.macro.jinja2.json' as taskMacro %}
+{
+    "Description": "Deploys a FARGATE ECS cluster and configures the TaskDefinitions that are available\n",
+    "Parameters": {
+        "ClusterName": {
+            "Description": "An environment name that will be prefixed to resource names",
+            "Type": "String"
+        },
+        "ContainerRegistryBaseURL": {
+            "Description": "The base URL (account) of the container registry",
+            "Type": "String"
+        },
+        "S3Endpoint": {
+            "Description": "The S3 endpoint for the task to talk to",
+            "Type": "String"
+        },
+        "S3Region": {
+            "Description": "The S3 region matching the endpoint",
+            "Type": "String"
+        },
+        "SQSEndpoint": {
+            "Description": "The SQS enpdoint for the task to talk to",
+            "Type": "String"
+        },
+        "SQSRegion": {
+            "Description": "The SQS region matching the endpoint",
+            "Type": "String"
+        },
+        "SQSQueueUrl": {
+            "Description": "The SQS queue to post candidate events to",
+            "Type": "String"
+        }
+    },
+    "Resources": {
+        "ECSCluster": {
+            "Type": "AWS::ECS::Cluster",
+            "Properties": {
+                "ClusterName": {
+                    "Ref": "ClusterName"
+                }
+            }
+        },
+        "ClusterTaskExecutionLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+                "LogGroupName": {
+                    "Fn::Sub": "/aws/lambda/${ClusterName}"
+                }
+            }
+        },
+        "TaskRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "Path": "/",
+                "RoleName": {
+                    "Fn::Sub": "${ClusterName}-taskRole"
+                },
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": "sts:AssumeRole",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "ecs-tasks.amazonaws.com"
+                            }
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "execution-role",
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:ListBucket",
+                                        "s3:ListBucketMultipartUploads"
+                                    ],
+                                    "Resource": "arn:aws:s3:::tdl-test-auth"
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:GetObject"
+                                    ],
+                                    "Resource": "arn:aws:s3:::tdl-test-auth/*"
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "sqs:GetQueueAttributes",
+                                        "sqs:SendMessageBatch",
+                                        "sqs:SendMessage"
+                                    ],
+                                    "Resource": "arn:aws:sqs:eu-west-1:577770582757:test-events"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "TaskDefinitionLangHmmm": {{ taskMacro.languageSpecificTask('hmmm', '0.1') }},
+        "TaskDefinitionLangJava": {{ taskMacro.languageSpecificTask('java', '0.1') }},
+        "TaskDefinitionLangScala": {{ taskMacro.languageSpecificTask('scala', '0.1') }}
+    }
+}

@@ -3,11 +3,16 @@ package tdl.datapoint.coverage.processing;
 import com.amazonaws.services.ecs.AmazonECS;
 import com.amazonaws.services.ecs.model.*;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class ECSCoverageTaskRunner {
+    private static final Logger LOG = Logger.getLogger(ECSCoverageTaskRunner.class.getName());
+
     private final String taskDefinitionPrefix;
     private AmazonECS ecsClient;
     private final Supplier<RunTaskRequest> runTaskRequestSupplier;
@@ -53,12 +58,15 @@ public class ECSCoverageTaskRunner {
         env.put("TAG", tag);
         env.put("CHALLENGE_ID", challengeId);
         setTaskEnv(runTaskRequest, env);
+
+        LOG.info("Issuing RunTask command: "+runTaskRequest);
         ecsClient.runTask(runTaskRequest);
     }
 
     private void setTaskEnv(RunTaskRequest runTaskRequest, HashMap<String, String> env) {
         TaskOverride overrides = new TaskOverride();
         ContainerOverride containerOverride = new ContainerOverride();
+        containerOverride.setName("default-container");
         List<KeyValuePair> envPairs = env.entrySet().stream().map(entry -> new KeyValuePair()
                 .withName(entry.getKey()).withValue(entry.getValue())).collect(Collectors.toList());
         containerOverride.setEnvironment(envPairs);

@@ -1,23 +1,28 @@
 [
   {
-    "ParameterKey": "S3_ENDPOINT",
+    "ParameterKey": "ClusterName",
+    "ParameterValue": "dpnt-coverage-dev"
+  },
+
+  {
+    "ParameterKey": "S3Endpoint",
     "ParameterValue": "http://host.docker.internal:9000"
   },
   {
-    "ParameterKey": "S3_REGION",
+    "ParameterKey": "S3Region",
     "ParameterValue": "us-east-1"
   },
 
   {
-    "ParameterKey": "SQS_ENDPOINT",
+    "ParameterKey": "SQSEndpoint",
     "ParameterValue": "http://host.docker.internal:9324"
   },
   {
-    "ParameterKey": "SQS_REGION",
+    "ParameterKey": "SQSRegion",
     "ParameterValue": "elasticmq"
   },
   {
-    "ParameterKey": "SQS_QUEUE_URL",
+    "ParameterKey": "SQSQueueUrl",
     "ParameterValue": "http://host.docker.internal:9324/queue/participant-events"
   },
 
