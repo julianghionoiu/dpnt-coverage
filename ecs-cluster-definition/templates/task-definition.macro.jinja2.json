@@ -6,9 +6,7 @@
     "RequiresCompatibilities": [
       "FARGATE"
     ],
-    "Family": {
-      "Fn::Sub": "${ClusterName}-{{ language }}"
-    },
+    "Family": "{{ CLUSTER_NAME }}-{{ language }}",
     "NetworkMode": "awsvpc",
     "ExecutionRoleArn": "arn:aws:iam::577770582757:role/ecsTaskExecutionRole",
     "TaskRoleArn": {
@@ -19,39 +17,27 @@
       {
         "Name": "default-container",
         "Essential": true,
-        "Image": {
-          "Fn::Sub": "${ContainerRegistryBaseURL}/accelerate-io/dpnt-coverage-{{ language }}:{{ version }}"
-        },
+        "Image": "{{ ECR_BASE_URL }}/accelerate-io/dpnt-coverage-{{ language }}:{{ version }}",
         "Environment": [
           {
-            "Name": "S3Endpoint",
-            "Value": {
-              "Ref": "S3Endpoint"
-            }
+            "Name": "S3_ENDPOINT",
+            "Value": "{{ S3_ENDPOINT }}"
           },
           {
-            "Name": "S3Region",
-            "Value": {
-              "Ref": "S3Region"
-            }
+            "Name": "S3_REGION",
+            "Value": "{{ S3_REGION }}"
           },
           {
-            "Name": "SQSEndpoint",
-            "Value": {
-              "Ref": "SQSEndpoint"
-            }
+            "Name": "SQS_ENDPOINT",
+            "Value": "{{ SQS_ENDPOINT }}"
           },
           {
-            "Name": "SQSRegion",
-            "Value": {
-              "Ref": "SQSRegion"
-            }
+            "Name": "SQS_REGION",
+            "Value": "{{ SQS_REGION }}"
           },
           {
-            "Name": "SQSQueueUrl",
-            "Value": {
-              "Ref": "SQSQueueUrl"
-            }
+            "Name": "SQS_QUEUE_URL",
+            "Value": "{{ SQS_QUEUE_URL }}"
           }
         ],
         "LogConfiguration": {
@@ -63,9 +49,7 @@
             "awslogs-group": {
               "Ref": "ClusterTaskExecutionLogGroup"
             },
-            "awslogs-stream-prefix": {
-              "Fn::Sub": "${ClusterName}-{{ language }}"
-            }
+            "awslogs-stream-prefix": "{{ CLUSTER_NAME }}-{{ language }}"
           }
         }
       }
