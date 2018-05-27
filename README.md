@@ -39,11 +39,20 @@ python local-ecs/ecs-server-wrapper.py start config/local.params.yml
 ```
 
 A note on the container networking. The container will attempt to call sevices on the docker host by using the `host.docker.internal` name.
-https://docs.docker.com/docker-for-mac/networking/#use-cases-and-workarounds
+https://docs.docker.com/docker-for-mac/networking/#use-cases-and-workarounds. 
+
+Also see https://stackoverflow.com/questions/48546124/what-is-linux-equivalent-of-docker-for-mac-host-internal
 If this is not supported on your machine, you have the option of changing the hostname used to locate the Docker host:
 ```bash
 DOCKER_HOST_WITHIN_CONTAINER=host.docker.internal python local-ecs/ecs-server-wrapper.py start config/local.params.yml
 ```
+or
+
+```bash
+DOCKER_HOST_WITHIN_CONTAINER=n.n.n.n python local-ecs/ecs-server-wrapper.py start config/local.params.yml
+```
+
+`host.docker.internal` should be static ip address or supported DNS entry of host (via Docker Host for Mac/Windows) on which the containers are running.
 
 Run the acceptance test
 
