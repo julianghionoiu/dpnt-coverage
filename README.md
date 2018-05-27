@@ -1,8 +1,23 @@
 # dpnt-coverage
 Collect coverage from SRCS files
 
-- [Java](./java/README.md)
+- [Java](./container/images/java/)
+- [Scala](./container/images/scala/)
+- [Hmmm](./container/images/hmmm/)
 
+### Updating sub-modules
+
+Root project contains three git submodules:
+
+- local-sqs
+- local-s3
+- local-ecs
+
+Run the below command in the project root to update the above submodules:
+ 
+```
+git submodule update --init
+```
 
 ## Acceptance test
 
@@ -16,7 +31,6 @@ We use the `hmmm` language to test the application.
 The language container image needs to be build and tagged as `latest`:
 ```
 ./container/buildDockerImage.sh hmmm
-./container/makeLatest.sh hmmm
 ```
 
 Start the local ECS simulator. The simulator will use the containers available in the local Docker registry.

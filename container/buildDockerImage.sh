@@ -25,3 +25,6 @@ language_image_tag="${language_image_name}:${language_image_version}"
 echo "~~~~~~ Building language specific image ~~~~~~"
 docker build -t ${language_image_tag} --build-arg BASE_IMAGE="${BASE_IMAGE_TAG}" \
     "${IMAGES_DIR}/${LANGUAGE_ID}/."
+
+echo "Make the current image the latest"
+docker tag ${language_image_tag} ${language_image_name}:latest
