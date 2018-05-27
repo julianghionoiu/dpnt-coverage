@@ -42,5 +42,3 @@ computeCoverageForChallenge() {
 
 computeCoverageForChallenge "hmmm" "TCH_R1/done" "SUM" "33"
 computeCoverageForChallenge "hmmm" "TCH_R2/done" "SUM" "44"
-computeCoverageForChallenge "hmmm" "TCH_R1/done" "CHK" "0"
-computeCoverageForChallenge "hmmm" "TCH_R2/done" "CHK" "0"
