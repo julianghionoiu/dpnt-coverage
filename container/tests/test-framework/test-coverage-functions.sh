@@ -17,6 +17,7 @@ computeCoverageForChallenge() {
    participant_id="participant"
    round_id="round"
 
+   echo "~~~~~~~~~~~~~~~~ Starting test ~~~~~~~~~~~~~~~~~"
    dockerImagePresent=$(docker images -q -f reference=accelerate-io/dpnt-coverage-${language_id}:latest)
    if [[ -z "${dockerImagePresent}" ]]; then
       echo "Test failed during setup, due to failing to find docker image for ${language_id} language" 1>&2

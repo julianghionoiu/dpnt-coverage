@@ -25,27 +25,9 @@ echo "Sanity check the template" > /dev/null
 aws cloudformation validate-template \
     --template-body "file://${TEMPLATE_FILE}"
 
-echo "Ensure stack exists" > /dev/null
-if ! aws cloudformation describe-stacks --stack-name ${STACK_NAME} > /dev/null 2>&1; then
-    echo "Stack does not exists. Creating..."
-    aws cloudformation create-stack \
-        --stack-name ${STACK_NAME} \
-        --region ${STACK_REGION} \
-        --template-body  "{ \"Resources\": { \"stack-${STACK_NAME}\": { \"Type\": \"AWS::S3::Bucket\" }}}"
-fi
-
 echo "Update stack" > /dev/null
-aws cloudformation update-stack \
+aws cloudformation deploy \
     --stack-name ${STACK_NAME} \
     --region ${STACK_REGION} \
-    --template-body "file://${TEMPLATE_FILE}" \
+    --template-file "${TEMPLATE_FILE}" \
     --capabilities CAPABILITY_NAMED_IAM
-
-echo "Wait for stack to complete the update" > /dev/null
-aws cloudformation wait stack-update-complete \
-    --stack-name ${STACK_NAME}
-if [ $? -gt 0 ]; then
-     aws cloudformation describe-stack-events \
-        --stack-name ${STACK_NAME} \
-        --max-items 10 | jq '.StackEvents[] | { "type": .ResourceType, "status":.ResourceStatus, "reason":.ResourceStatusReason}'
-fi

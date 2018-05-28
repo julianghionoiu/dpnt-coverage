@@ -3,7 +3,8 @@
 set -e
 set -o pipefail
 
-source ../test-framework/test-coverage-functions.sh
+SCRIPT_CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source ${SCRIPT_CURRENT_DIR}/../test-framework/test-coverage-functions.sh
 
 computeCoverageForChallenge "hmmm" "TCH_R1/done" "SUM" "33"
 computeCoverageForChallenge "hmmm" "TCH_R2/done" "SUM" "44"
