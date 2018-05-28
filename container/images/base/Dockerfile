@@ -1,4 +1,5 @@
 FROM java:8u111-jdk
+RUN update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
 
 RUN apt-get update && apt-get install -qy \
     python-pip \

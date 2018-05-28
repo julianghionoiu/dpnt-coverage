@@ -126,7 +126,7 @@ Set the bucket and the key to some meaningful values.
 
 Invoke the dev lambda
 ```
-SLS_DEBUG=* serverless invoke --stage dev --function call-ecs-to-compute-coverage --path src/test/resources/tdl/datapoint/coverage/sample_s3_event.json
+SLS_DEBUG=* serverless invoke --stage dev --function call-ecs-to-compute-coverage --path src/test/resources/tdl/datapoint/coverage/sample_s3_via_sns_event.json
 ```
 
 Check the destination queue for that particular environment.

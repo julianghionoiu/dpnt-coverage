@@ -11,6 +11,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.jgit.api.Git;
 import tdl.datapoint.coverage.processing.*;
 import tdl.participant.queue.connector.SqsEventQueue;
@@ -29,10 +30,10 @@ import static tdl.datapoint.coverage.ApplicationEnv.*;
 public class CoverageUploadHandler implements RequestHandler<Map<String, Object>, String> {
     private static final Logger LOG = Logger.getLogger(CoverageUploadHandler.class.getName());
     private AmazonS3 s3Client;
-    private AmazonECS ecsClient;
     private SqsEventQueue participantEventQueue;
     private S3SrcsToGitExporter srcsToGitExporter;
     private final ECSCoverageTaskRunner ecsCoverageTaskRunner;
+    private ObjectMapper jsonObjectMapper;
 
     private static String getEnv(ApplicationEnv key) {
         String env = System.getenv(key.name());
@@ -48,7 +49,7 @@ public class CoverageUploadHandler implements RequestHandler<Map<String, Object>
                 getEnv(S3_ENDPOINT),
                 getEnv(S3_REGION));
 
-        ecsClient = createECSClient(
+        AmazonECS ecsClient = createECSClient(
                 getEnv(ECS_ENDPOINT),
                 getEnv(ECS_REGION));
 
@@ -68,6 +69,8 @@ public class CoverageUploadHandler implements RequestHandler<Map<String, Object>
         );
         String queueUrl = getEnv(SQS_QUEUE_URL);
         participantEventQueue = new SqsEventQueue(queueClient, queueUrl);
+
+        jsonObjectMapper = new ObjectMapper();
     }
 
     private static AmazonS3 createS3Client(String endpoint, String region) {
@@ -99,7 +102,7 @@ public class CoverageUploadHandler implements RequestHandler<Map<String, Object>
     @Override
     public String handleRequest(Map<String, Object> s3EventMap, Context context) {
         try {
-            handleS3Event(S3BucketEvent.from(s3EventMap));
+            handleS3Event(S3BucketEvent.from(s3EventMap, jsonObjectMapper));
             return "OK";
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, ex.getMessage(), ex);

@@ -1,6 +1,7 @@
 package tdl.datapoint.coverage;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
@@ -10,9 +11,7 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.TemporaryFolder;
 import org.yaml.snakeyaml.Yaml;
-import tdl.datapoint.coverage.support.LocalS3Bucket;
-import tdl.datapoint.coverage.support.LocalSQSQueue;
-import tdl.datapoint.coverage.support.TestSrcsFile;
+import tdl.datapoint.coverage.support.*;
 import tdl.participant.queue.connector.EventProcessingException;
 import tdl.participant.queue.connector.QueueEventHandlers;
 import tdl.participant.queue.connector.SqsEventQueue;
@@ -44,6 +43,7 @@ public class CoverageDatapointAcceptanceTest {
     private LocalS3Bucket localS3Bucket;
     private List<CoverageComputedEvent> coverageComputedEvents;
     private List<ProgrammingLanguageDetectedEvent> languageDetectedEvents;
+    private ObjectMapper mapper;
 
     @Before
     public void setUp() throws EventProcessingException, IOException {
@@ -68,6 +68,8 @@ public class CoverageDatapointAcceptanceTest {
         languageDetectedEvents = new Stack<>();
         queueEventHandlers.on(ProgrammingLanguageDetectedEvent.class, languageDetectedEvents::add);
         sqsEventQueue.subscribeToMessages(queueEventHandlers);
+
+        mapper = new ObjectMapper();
     }
 
     private static String getEnv(ApplicationEnv key) {
@@ -101,11 +103,11 @@ public class CoverageDatapointAcceptanceTest {
         TestSrcsFile srcsForTestChallenge = new TestSrcsFile("HmmmLang_R1Cov33_R2Cov44.srcs");
 
         // When - Upload event happens
+        S3Event s3Event = localS3Bucket.putObject(srcsForTestChallenge.asFile(), s3destination);
         coverageUploadHandler.handleRequest(
-                convertToMap(localS3Bucket.putObject(srcsForTestChallenge.asFile(), s3destination)),
+                convertToMap(wrapAsSNSEvent(s3Event)),
                 NO_CONTEXT);
         waitForQueueToReceiveEvents();
-
 
         // Then - Language detected event should be generated for the challenge
         assertThat(languageDetectedEvents.size(), equalTo(1));
@@ -127,6 +129,11 @@ public class CoverageDatapointAcceptanceTest {
         assertThat(coverageRound2.getParticipant(), equalTo(participantId));
         assertThat(coverageRound2.getRoundId(), equalTo(challengeId+"_R2"));
         assertThat(coverageRound2.getCoverage(), equalTo(44));
+    }
+
+    private String wrapAsSNSEvent(S3Event s3Event) throws JsonProcessingException {
+        SNSEvent snsEvent = new SNSEvent(mapper.writeValueAsString(s3Event.asJsonNode()));
+        return mapper.writeValueAsString(snsEvent.asJsonNode());
     }
 
     //~~~~~~~~~~ Helpers ~~~~~~~~~~~~~`
