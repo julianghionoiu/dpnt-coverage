@@ -24,6 +24,8 @@ language_image_tag="${language_image_name}:${language_image_version}"
 
 echo "Running ${language_image_tag} from the local docker registry"
 docker run                                                                      \
+      --interactive                                                             \
+      --tty                                                                     \
       --entrypoint "/bin/bash"                                                  \
       --env AWS_ACCESS_KEY_ID=unused                                            \
       --env AWS_SECRET_KEY=unused                                               \
