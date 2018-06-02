@@ -44,17 +44,20 @@ RUN apt-get update && apt-get install -qy \
     zlib1g-dev \
     --no-install-recommends && rm -r /var/lib/apt/lists/*
 
-RUN echo progress-bar >> ~/.curlrc
+RUN /bin/bash -l -c "echo progress-bar >> ~/.curlrc"
 RUN curl -sSL https://rvm.io/mpapis.asc | gpg --import -
 RUN echo "Downloading and installing 'rvm'" && curl -sSL https://get.rvm.io | bash -s stable
 
 RUN echo "Downloading and installing 'rbenv'" && git clone https://github.com/rbenv/rbenv.git ~/.rbenv
-RUN echo "export PATH=~/.rbenv/bin:$PATH" >> ~/.bashrc
-RUN echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+RUN echo "export PATH=$HOME/.rbenv/bin:$PATH" >> ~/.bashrc
+RUN echo 'eval "$(rbenv init -)"' >> $HOME/.bashrc
 RUN git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
-RUN echo 'export PATH="~/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.bashrc
+RUN echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.bashrc
+RUN echo 'export PATH="$HOME/.rbenv/versions/${RUBY_VERSION}/bin:$PATH"' >> ~/.bashrc
 
 RUN /bin/bash -l -c "echo Downloading and installing \'ruby via rbenv\'"
 RUN /bin/bash -l -c "curl -fsSL https://gist.github.com/mislav/055441129184a1512bb5.txt | rbenv install --patch ${RUBY_VERSION}"
 RUN /bin/bash -l -c "rbenv global ${RUBY_VERSION}"
 RUN /bin/bash -l -c "ruby --version"
+RUN /bin/bash -l -c "gem install bundler"
+RUN /bin/bash -l -c "rbenv rehash"
