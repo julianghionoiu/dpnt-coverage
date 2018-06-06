@@ -22,3 +22,7 @@ RUN pip install -U "setuptools==3.4.1"
 RUN pip install -U "pip==1.5.4"
 RUN pip install -U "Mercurial==2.9.1"
 RUN pip install -U "virtualenv==1.11.4"
+
+RUN /bin/bash -l -c "python --version"
+RUN /bin/bash -l -c "pip --version"
+RUN /bin/bash -l -c "virtualenv --version"
