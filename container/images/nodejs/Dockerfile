@@ -28,8 +28,9 @@ RUN curl https://raw.githubusercontent.com/creationix/nvm/v${NVM_VERSION}/instal
     && nvm alias default ${NODE_VERSION} \
     && nvm use default
 
-ENV NODE_PATH ${NVM_DIR}/v${NODE_VERSION}/lib/node_modules
-ENV PATH      ${NVM_DIR}/v${NODE_VERSION}/bin:${PATH}
+ENV NODE_MODULES_PATH ${NVM_DIR}/v${NODE_VERSION}/lib/node_modules
+ENV NODE_PATH ${NVM_DIR}/versions/node/v${NODE_VERSION}
+ENV PATH      ${NODE_PATH}/bin:${NODE_MODULES_PATH}/bin:${PATH}
 
 RUN /bin/bash -l -c 'echo "***** nvm version $(nvm --version) *****"'
 RUN /bin/bash -l -c 'echo "***** npm version $(npm --version) *****"'
