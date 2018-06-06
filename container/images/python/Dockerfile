@@ -2,54 +2,23 @@ ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
 RUN set -ex; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends \
-        autoconf \
-        automake \
-        bzip2 \
-        dpkg-dev \
-        file \
-        g++ \
+    apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y \
+        build-essential \
+        ca-certificates \
         gcc \
-        imagemagick \
-        libbz2-dev \
-        libc6-dev \
-        libcurl4-openssl-dev \
-        libdb-dev \
-        libevent-dev \
-        libffi-dev \
-        libgdbm-dev \
-        libgeoip-dev \
-        libglib2.0-dev \
-        libjpeg-dev \
-        libkrb5-dev \
-        liblzma-dev \
-        libmagickcore-dev \
-        libmagickwand-dev \
-        libncurses5-dev \
-        libncursesw5-dev \
-        libpng-dev \
+        git \
         libpq-dev \
-        libreadline-dev \
-        libsqlite3-dev \
-        libssl-dev \
-        libtool \
-        libwebp-dev \
-        libxml2-dev \
-        libxslt-dev \
-        libyaml-dev \
         make \
-        patch \
-        xz-utils \
-        zlib1g-dev \
-# https://lists.debian.org/debian-devel-announce/2016/09/msg00000.html
-		$( \
-# if we use just "apt-cache show" here, it returns zero because "Can't select versions from package 'libmysqlclient-dev' as it is purely virtual", hence the pipe to grep
-			if apt-cache show 'default-libmysqlclient-dev' 2>/dev/null | grep -q '^Version:'; then \
-				echo 'default-libmysqlclient-dev'; \
-			else \
-				echo 'libmysqlclient-dev'; \
-			fi \
-		) \
-	; \
-	rm -rf /var/lib/apt/lists/*
+        python-pip \
+        python2.7 \
+        python2.7-dev \
+        ssh \
+    && apt-get autoremove \
+    && apt-get clean
+
+RUN pip install -U "setuptools==3.4.1"
+RUN pip install -U "pip==1.5.4"
+RUN pip install -U "Mercurial==2.9.1"
+RUN pip install -U "virtualenv==1.11.4"
