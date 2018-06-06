@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y -q --no-install-recommends \
 
 ENV NVM_DIR /root/.nvm
 ENV NVM_VERSION 0.33.11
-ENV NODE_VERSION 5.6.0
+ENV NODE_VERSION 6.1.0
 
 RUN mkdir -p ${NVM_DIR}
 
@@ -26,7 +26,8 @@ RUN curl https://raw.githubusercontent.com/creationix/nvm/v${NVM_VERSION}/instal
     && . ${NVM_DIR}/nvm.sh \
     && nvm install ${NODE_VERSION} \
     && nvm alias default ${NODE_VERSION} \
-    && nvm use default
+    && nvm use default \
+    && npm install -g npm
 
 ENV NODE_MODULES_PATH ${NVM_DIR}/v${NODE_VERSION}/lib/node_modules
 ENV NODE_PATH ${NVM_DIR}/versions/node/v${NODE_VERSION}
