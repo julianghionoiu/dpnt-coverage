@@ -41,4 +41,9 @@ RUN /bin/bash -l -c "echo 'gem: --no-ri --no-rdoc' > ~/.gemrc"
 RUN /bin/bash -l -c "echo 'source /etc/profile.d/rvm.sh' > ~/.bashrc"
 RUN /bin/bash -l -c "gem install bundler --no-ri --no-rdoc"
 
+ENV RUBY_PATH /usr/local/rvm/rubies/ruby-${RUBY_VERSION}
+ENV GEM_PATH  /usr/local/rvm/gems/ruby-${RUBY_VERSION}
+ENV RVM_PATH  /usr/local/rvm
+ENV PATH      ${RVM_PATH}/bin:${GEM_PATH}/bin:${RUBY_PATH}/bin:${PATH}
+
 RUN /bin/bash -l -c 'rvm info'
