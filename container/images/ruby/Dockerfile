@@ -39,6 +39,11 @@ RUN apt-get update && apt-get install -qy \
 RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3
 RUN /bin/bash -l -c "curl -L get.rvm.io | bash -s stable"
 RUN /bin/bash -l -c "rvm install ${RUBY_VERSION}"
+RUN /bin/bash -l -c "rvm --default use ${RUBY_VERSION}"
 RUN /bin/bash -l -c "echo 'gem: --no-ri --no-rdoc' > ~/.gemrc"
 RUN /bin/bash -l -c "echo 'source /etc/profile.d/rvm.sh' > ~/.bashrc"
 RUN /bin/bash -l -c "gem install bundler --no-ri --no-rdoc"
+
+RUN /bin/bash -l -c 'rvm --version'
+RUN /bin/bash -l -c 'ruby --version'
+RUN /bin/bash -l -c 'echo "gem version $(gem --version)"'
