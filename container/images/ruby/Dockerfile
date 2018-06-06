@@ -9,9 +9,6 @@ RUN /bin/bash -l -c "curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key
 RUN /bin/bash -l -c 'echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list'
 
 RUN apt-get update && apt-get install -qy \
-    ruby \
-    ruby-dev \
-    ruby-bundler \
     curl \
     openssl \
     patch \
@@ -44,6 +41,4 @@ RUN /bin/bash -l -c "echo 'gem: --no-ri --no-rdoc' > ~/.gemrc"
 RUN /bin/bash -l -c "echo 'source /etc/profile.d/rvm.sh' > ~/.bashrc"
 RUN /bin/bash -l -c "gem install bundler --no-ri --no-rdoc"
 
-RUN /bin/bash -l -c 'rvm --version'
-RUN /bin/bash -l -c 'ruby --version'
-RUN /bin/bash -l -c 'echo "gem version $(gem --version)"'
+RUN /bin/bash -l -c 'rvm info'
