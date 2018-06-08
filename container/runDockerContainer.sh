@@ -24,41 +24,26 @@ language_image_name="${DEFAULT_IMAGE_PREFIX}${LANGUAGE_ID}"
 language_image_tag="${language_image_name}:${language_image_version}"
 
 echo "Running ${language_image_tag} from the local docker registry"
+DOCKER_DEBUG_PARAMS=""
 if [[ "${DEBUG}" == "true" ]]; then
+    DOCKER_DEBUG_PARAMS="--interactive --tty --entrypoint /bin/bash"
     echo "*************************"
     echo "* Running in Debug mode *"
     echo "*************************"
-    docker run                                                                      \
-          --interactive                                                             \
-          --tty                                                                     \
-          --entrypoint "/bin/bash"                                                  \
-          --env AWS_ACCESS_KEY_ID=unused                                            \
-          --env AWS_SECRET_KEY=unused                                               \
-          --env S3_ENDPOINT=unused                                                  \
-          --env S3_REGION=unused                                                    \
-          --env SQS_ENDPOINT=unused                                                 \
-          --env SQS_REGION=unused                                                   \
-          --env SQS_QUEUE_URL=unused                                                \
-          --env PARTICIPANT_ID=${PARTICIPANT_ID}                                    \
-          --env ROUND_ID=${ROUND_ID}                                                \
-          --env REPO=${REPO}                                                        \
-          --env TAG=${TAG}                                                          \
-          --env CHALLENGE_ID=${CHALLENGE_ID}                                        \
-          ${language_image_tag}
-
-else
-    docker run                                                                      \
-          --env AWS_ACCESS_KEY_ID=unused                                            \
-          --env AWS_SECRET_KEY=unused                                               \
-          --env S3_ENDPOINT=unused                                                  \
-          --env S3_REGION=unused                                                    \
-          --env SQS_ENDPOINT=unused                                                 \
-          --env SQS_REGION=unused                                                   \
-          --env SQS_QUEUE_URL=unused                                                \
-          --env PARTICIPANT_ID=${PARTICIPANT_ID}                                    \
-          --env ROUND_ID=${ROUND_ID}                                                \
-          --env REPO=${REPO}                                                        \
-          --env TAG=${TAG}                                                          \
-          --env CHALLENGE_ID=${CHALLENGE_ID}                                        \
-          ${language_image_tag}
 fi
+
+docker run                                                                      \
+      ${DOCKER_DEBUG_PARAMS}                                                    \
+      --env AWS_ACCESS_KEY_ID=unused                                            \
+      --env AWS_SECRET_KEY=unused                                               \
+      --env S3_ENDPOINT=unused                                                  \
+      --env S3_REGION=unused                                                    \
+      --env SQS_ENDPOINT=unused                                                 \
+      --env SQS_REGION=unused                                                   \
+      --env SQS_QUEUE_URL=unused                                                \
+      --env PARTICIPANT_ID=${PARTICIPANT_ID}                                    \
+      --env ROUND_ID=${ROUND_ID}                                                \
+      --env REPO=${REPO}                                                        \
+      --env TAG=${TAG}                                                          \
+      --env CHALLENGE_ID=${CHALLENGE_ID}                                        \
+      ${language_image_tag}
