@@ -6,6 +6,7 @@ set -o pipefail
 
 SCRIPT_CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 IMAGES_DIR="${SCRIPT_CURRENT_DIR}/images"
+export DEBUG="${DEBUG:-}"
 
 function die() { echo >&2 $1; exit 1; }
 [ "$#" -eq 6 ] || die "Usage: $0 LANGUAGE_ID PARTICIPANT_ID ROUND_ID REPO TAG CHALLENGE_ID"
@@ -23,7 +24,16 @@ language_image_name="${DEFAULT_IMAGE_PREFIX}${LANGUAGE_ID}"
 language_image_tag="${language_image_name}:${language_image_version}"
 
 echo "Running ${language_image_tag} from the local docker registry"
+DOCKER_DEBUG_PARAMS=""
+if [[ "${DEBUG}" == "true" ]]; then
+    DOCKER_DEBUG_PARAMS="--interactive --tty --entrypoint /bin/bash"
+    echo "*************************"
+    echo "* Running in Debug mode *"
+    echo "*************************"
+fi
+
 docker run                                                                      \
+      ${DOCKER_DEBUG_PARAMS}                                                    \
       --env AWS_ACCESS_KEY_ID=unused                                            \
       --env AWS_SECRET_KEY=unused                                               \
       --env S3_ENDPOINT=unused                                                  \
