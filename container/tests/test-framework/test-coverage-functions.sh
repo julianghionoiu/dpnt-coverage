@@ -14,19 +14,17 @@ computeCoverageForChallenge() {
    repo="https://github.com/julianghionoiu/tdl-runner-${language_id}"
    challenge_id="$3"
    expectedResult="$4"
-   participant_id="participant"
-   round_id="round"
 
    echo "~~~~~~~~~~~~~~~~ Starting test ~~~~~~~~~~~~~~~~~"
    dockerImagePresent=$(docker images -q -f reference=accelerate-io/dpnt-coverage-${language_id}:latest)
    if [[ -z "${dockerImagePresent}" ]]; then
       echo "Test failed during setup, due to failing to find docker image for ${language_id} language" 1>&2
-      testOutcome "Failed" "${language_id}" "${challenge_id}" "${participant_id}" "${round_id}"
+      testOutcome "Failed" "${language_id}" "${challenge_id}" "${expectedResult}" "No Docker Image"
       return
    fi
 
    # when
-   actualResult=$( . ${SCRIPT_CURRENT_DIR}/../../runDockerContainer.sh ${language_id} ${participant_id} ${round_id} ${repo} ${tag} ${challenge_id} | tail -1 )
+   actualResult=$( ${SCRIPT_CURRENT_DIR}/../../runDockerContainer.sh ${language_id} "participant" "round" ${repo} ${tag} ${challenge_id} | tail -1 )
    actualResult=$(echo ${actualResult} | awk '{print coverage, $3}' | tr '="' ' ' | awk '{print $2}')
 
    # then
@@ -39,12 +37,12 @@ computeCoverageForChallenge() {
 
    if [[ "${actualResult}" = "${expectedResult}" ]]; then
       echo "Test passed"
-      testOutcome "Passed" "${language_id}" "${challenge_id}" "${participant_id}" "${round_id}"
+      testOutcome "Passed" "${language_id}" "${challenge_id}" "${expectedResult}" "${actualResult}"
    else
       echo "Test failed due to result mismatch"      1>&2
       echo "   Actual result: '${actualResult}'"     1>&2
       echo "   Expected result: '${expectedResult}'" 1>&2
-      testOutcome "Failed" "${language_id}" "${challenge_id}" "${participant_id}" "${round_id}"
+      testOutcome "Failed" "${language_id}" "${challenge_id}" "${expectedResult}" "${actualResult}"
    fi
 }
 
@@ -52,13 +50,13 @@ testOutcome() {
     outcome="$1"
     language_id="$2"
     challenge_id="$3"
-    participant_id="$4"
-    round_id="$5"
+    expected="$4"
+    actual="$5"
 
     if [[ "${outcome}" = "Passed" ]]; then
-        passedTests+=("language=${language_id}|challenge=${challenge_id}|participant=${participant_id}|round=${round_id}")
+        passedTests+=("language=${language_id}|challenge=${challenge_id}|expected=${expected}|actual=${actual}")
     elif [[ "${outcome}" = "Failed" ]]; then
-        failedTests+=("language=${language_id}|challenge=${challenge_id}|participant=${participant_id}|round=${round_id}")
+        failedTests+=("language=${language_id}|challenge=${challenge_id}|expected=${expected}|actual=${actual}")
     fi
 }
 

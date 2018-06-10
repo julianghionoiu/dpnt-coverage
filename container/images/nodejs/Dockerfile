@@ -33,6 +33,9 @@ ENV NODE_MODULES_PATH ${NVM_DIR}/v${NODE_VERSION}/lib/node_modules
 ENV NODE_PATH ${NVM_DIR}/versions/node/v${NODE_VERSION}
 ENV PATH      ${NODE_PATH}/bin:${NODE_MODULES_PATH}/bin:${PATH}
 
-RUN /bin/bash -l -c 'echo "***** nvm version $(nvm --version) *****"'
-RUN /bin/bash -l -c 'echo "***** npm version $(npm --version) *****"'
-RUN /bin/bash -l -c 'echo "***** node version $(node --version) *****"'
+RUN nvm --version
+RUN npm --version
+RUN node --version
+
+# Precache dependencies for faster run - will populate the npm cache (~/.npm/_cacache)
+

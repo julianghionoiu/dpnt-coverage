@@ -17,3 +17,9 @@ RUN \
   rm sbt-$SBT_VERSION.deb && \
   apt-get install sbt && \
   sbt sbtVersion
+
+# Precache dependencies for faster run - will populate the IVY cache
+ENV SBT_BUILD_TMP /tmp/sbt
+RUN mkdir -p ${SBT_BUILD_TMP} && \
+    git clone --depth 1 https://github.com/julianghionoiu/tdl-runner-scala.git ${SBT_BUILD_TMP}
+RUN ( cd ${SBT_BUILD_TMP} && sbt --debug update )
