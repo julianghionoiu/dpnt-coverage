@@ -1,13 +1,9 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-ARG RUBY_VERSION
 ENV RUBY_VERSION="2.2.2"
 
-RUN /bin/bash -l -c "curl -sL https://deb.nodesource.com/setup_8.x | bash -"
-RUN /bin/bash -l -c "curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -"
-RUN /bin/bash -l -c 'echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list'
-
+# Manually install dependency to be able to clean up after ourselves
 RUN apt-get update && apt-get install -qy \
     curl \
     openssl \
@@ -31,19 +27,29 @@ RUN apt-get update && apt-get install -qy \
     bison \
     pkg-config \
     libffi-dev \
+    libgmp-dev \
     --no-install-recommends && rm -r /var/lib/apt/lists/*
 
+# Install RVM
 RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3
-RUN /bin/bash -l -c "curl -L get.rvm.io | bash -s stable"
-RUN /bin/bash -l -c "rvm install ${RUBY_VERSION}"
-RUN /bin/bash -l -c "rvm --default use ${RUBY_VERSION}"
-RUN /bin/bash -l -c "echo 'gem: --no-ri --no-rdoc' > ~/.gemrc"
-RUN /bin/bash -l -c "echo 'source /etc/profile.d/rvm.sh' > ~/.bashrc"
-RUN /bin/bash -l -c "gem install bundler --no-ri --no-rdoc"
-
-ENV RUBY_PATH /usr/local/rvm/rubies/ruby-${RUBY_VERSION}
-ENV GEM_PATH  /usr/local/rvm/gems/ruby-${RUBY_VERSION}
+RUN curl -L get.rvm.io | bash -s stable
 ENV RVM_PATH  /usr/local/rvm
-ENV PATH      ${RVM_PATH}/bin:${GEM_PATH}/bin:${RUBY_PATH}/bin:${PATH}
+ENV PATH      ${RVM_PATH}/bin:${PATH}
 
-RUN /bin/bash -l -c 'rvm info'
+# Install RUBY
+RUN rvm install ${RUBY_VERSION}
+RUN rvm --default use ${RUBY_VERSION}
+ENV RUBY_PATH /usr/local/rvm/rubies/ruby-${RUBY_VERSION}
+ENV GEM_HOME  /usr/local/rvm/gems/ruby-${RUBY_VERSION}
+ENV GEM_PATH  ${GEM_HOME}:${GEM_PATH}
+ENV PATH      ${RUBY_PATH}/bin:${GEM_HOME}/bin:${PATH}
+RUN rvm info
+
+# Install BUNDLER
+RUN echo 'gem: --no-ri --no-rdoc' > ~/.gemrc
+RUN gem install bundler --no-ri --no-rdoc
+
+# Precache dependencies for faster run
+RUN wget https://raw.githubusercontent.com/julianghionoiu/tdl-runner-ruby/master/Gemfile \
+    -O /tmp/Gemfile.precache && \
+    bundle install --gemfile=/tmp/Gemfile.precache
