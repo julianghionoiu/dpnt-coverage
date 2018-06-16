@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -qy \
     git \
     libxml2-utils \
     jq \
+    dos2unix \
     --no-install-recommends && rm -r /var/lib/apt/lists/*
 RUN pip install awscli
 
