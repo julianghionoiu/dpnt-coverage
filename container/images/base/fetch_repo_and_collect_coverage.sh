@@ -48,7 +48,7 @@ fi
 
 # Convert from Dos to Unix - in case format is in non-unix format
 echo "Convert from Dos to Unix - in case format is in non-unix format"
-find . -type f           \
+find ${LOCAL_REPO_DESTINATION} -type f           \
      ! -path "*/.git/*"  \
      ! -path "*/.idea/*" \
      | xargs -n1 -I {} dos2unix {} || true
