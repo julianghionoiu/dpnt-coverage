@@ -42,10 +42,7 @@ if [[ "${REPO}" == s3://* ]]; then
         --tag ${TAG}
 else
     echo "Assuming Git repo"
-    git clone --depth 1 ${REPO} ${LOCAL_REPO_DESTINATION}
-    local_git="git --git-dir=${LOCAL_REPO_DESTINATION}/.git --work-tree=${LOCAL_REPO_DESTINATION}"
-    ${local_git} checkout ${TAG}
-    ${local_git} pull origin ${TAG}
+    git clone --branch ${TAG} --depth 1 ${REPO} ${LOCAL_REPO_DESTINATION}
 fi
 # Output: Repo available at ${LOCAL_REPO_DESTINATION}
 
