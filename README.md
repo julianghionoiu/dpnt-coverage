@@ -38,7 +38,7 @@ Start the local ECS simulator. The simulator will use the containers available i
 python local-ecs/ecs-server-wrapper.py start config/local.params.yml
 ```
 
-A note on the container networking. The container will attempt to call sevices on the docker host by using the `host.docker.internal` name.
+A note on the container networking. The container will attempt to call services on the docker host by using the `host.docker.internal` name.
 https://docs.docker.com/docker-for-mac/networking/#use-cases-and-workarounds. 
 
 Also see https://stackoverflow.com/questions/48546124/what-is-linux-equivalent-of-docker-for-mac-host-internal

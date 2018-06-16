@@ -54,7 +54,7 @@ echo "Convert from Dos to Unix - in case format is in non-unix format"
 find . -type f           \
      ! -path "*/.git/*"  \
      ! -path "*/.idea/*" \
-     | xargs -0 -I {} dos2unix "{}" || true
+     | xargs -n1 -I {} dos2unix {} || true
 
 # Run the coverage
 COVERAGE_SCRIPT="${LOCAL_REPO_DESTINATION}/get_coverage_for_challenge.sh"
