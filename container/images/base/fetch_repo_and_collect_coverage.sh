@@ -46,6 +46,17 @@ else
 fi
 # Output: Repo available at ${LOCAL_REPO_DESTINATION}
 
+echo  "~~~~~~ Convert from Dos to Unix - in case format is in non-unix format ~~~~~~" > /dev/null
+pushd .
+cd ${LOCAL_REPO_DESTINATION}
+# -I         <== do not match pattern i binary files
+# -l         <== only show the matching file names
+# -e 'xxx'   <== match regex pattern
+git init
+git grep --cached -I -l -e $'\r' | xargs -n1 -I "{}" dos2unix "{}" || true
+popd
+# Output: Repo text files guaranteed to have unix LF as newline
+
 # Run the coverage
 COVERAGE_SCRIPT="${LOCAL_REPO_DESTINATION}/get_coverage_for_challenge.sh"
 chmod a+x ${COVERAGE_SCRIPT}
