@@ -9,4 +9,7 @@ source ${SCRIPT_CURRENT_DIR}/../test-framework/test-coverage-functions.sh
 computeCoverageForChallenge "hmmm" "TCH_R1/done" "SUM" "33"
 computeCoverageForChallenge "hmmm" "TCH_R2/done" "SUM" "44"
 
+computeCoverageForChallenge "hmmm" "CRLF-Test" "SUM" "33"
+computeCoverageForChallenge "hmmm" "CRLF-Test" "SUM" "44"
+
 displayPassFailSummary
