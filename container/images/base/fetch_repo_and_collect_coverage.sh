@@ -48,6 +48,8 @@ fi
 
 # Convert from Dos to Unix - in case format is in non-unix format
 echo "Convert from Dos to Unix - in case format is in non-unix format"
+cd ${LOCAL_REPO_DESTINATION}
+git init
 # -I         <== do not match pattern i binary files
 # -l         <== only show the matching file names
 # -e 'xxx'   <== match regex pattern
