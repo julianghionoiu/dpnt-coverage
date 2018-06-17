@@ -101,7 +101,6 @@ public class CoverageDatapointAcceptanceTest {
         String participantId = generateId();
         String s3destination = String.format("%s/%s/file.srcs", challengeId, participantId);
         TestSrcsFile srcsForTestChallenge = new TestSrcsFile("HmmmLang_R1Cov33_R2Cov44.srcs");
-//        TestSrcsFile srcsForTestChallenge = new TestSrcsFile("JavaLang_R1CovXX_R2CovYY.srcs");
 
         // When - Upload event happens
         S3Event s3Event = localS3Bucket.putObject(srcsForTestChallenge.asFile(), s3destination);
@@ -117,7 +116,6 @@ public class CoverageDatapointAcceptanceTest {
         assertThat(languageEvent.getParticipant(), equalTo(participantId));
         assertThat(languageEvent.getChallengeId(), equalTo(challengeId));
         assertThat(languageEvent.getProgrammingLanguage(), equalTo("HmmmLang"));
-//        assertThat(languageEvent.getProgrammingLanguage(), equalTo("Java"));
 
         // Then - Coverage events are computed for the deploy tags
         assertThat(coverageComputedEvents.size(), equalTo(2));
