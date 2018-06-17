@@ -48,10 +48,10 @@ fi
 
 # Convert from Dos to Unix - in case format is in non-unix format
 echo "Convert from Dos to Unix - in case format is in non-unix format"
-find ${LOCAL_REPO_DESTINATION} -type f           \
-     ! -path "*/.git/*"  \
-     ! -path "*/.idea/*" \
-     | xargs -n1 -I {} dos2unix {} || true
+# -I         <== do not match pattern i binary files
+# -l         <== only show the matching file names
+# -e 'xxx'   <== match regex pattern
+git grep --cached -I -l -e $'\r' | xargs -n1 -I {} dos2unix {} || true
 
 # Run the coverage
 COVERAGE_SCRIPT="${LOCAL_REPO_DESTINATION}/get_coverage_for_challenge.sh"
