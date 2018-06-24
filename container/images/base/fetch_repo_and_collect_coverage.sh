@@ -5,6 +5,8 @@ set -e
 set -u
 set -o pipefail
 
+SCRIPT_CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # To check if an ENV variable exists, we dereference the input string $1 -> !1
 # then then we attempt parameter expansion with the "+x" string
 # it should return an empty string if ENV not defined
@@ -13,7 +15,7 @@ function ensure_env {
     if [ -z "${!1+x}" ]; then echo "Environment variable $1 not set"; exit 1; fi
 }
 
-WORK_DIR=`pwd`
+WORK_DIR=${SCRIPT_CURRENT_DIR}
 
 ensure_env "S3_ENDPOINT"
 ensure_env "S3_REGION"
