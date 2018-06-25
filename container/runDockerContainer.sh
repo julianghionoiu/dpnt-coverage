@@ -26,7 +26,7 @@ language_image_tag="${language_image_name}:${language_image_version}"
 echo "Running ${language_image_tag} from the local docker registry"
 DOCKER_DEBUG_PARAMS=""
 if [[ "${DEBUG}" == "true" ]]; then
-    DOCKER_DEBUG_PARAMS="--interactive --tty --entrypoint /bin/bash"
+    DOCKER_DEBUG_PARAMS="--interactive --tty --entrypoint /bin/bash --volume ${SCRIPT_CURRENT_DIR}:/debug-repo"
     echo "*************************"
     echo "* Running in Debug mode *"
     echo "*************************"

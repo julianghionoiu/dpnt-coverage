@@ -5,6 +5,8 @@ set -e
 set -u
 set -o pipefail
 
+SCRIPT_CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # To check if an ENV variable exists, we dereference the input string $1 -> !1
 # then then we attempt parameter expansion with the "+x" string
 # it should return an empty string if ENV not defined
@@ -13,7 +15,7 @@ function ensure_env {
     if [ -z "${!1+x}" ]; then echo "Environment variable $1 not set"; exit 1; fi
 }
 
-WORK_DIR=`pwd`
+WORK_DIR=${SCRIPT_CURRENT_DIR}
 
 ensure_env "S3_ENDPOINT"
 ensure_env "S3_REGION"
@@ -42,12 +44,20 @@ if [[ "${REPO}" == s3://* ]]; then
         --tag ${TAG}
 else
     echo "Assuming Git repo"
-    git clone --depth 1 ${REPO} ${LOCAL_REPO_DESTINATION}
-    local_git="git --git-dir=${LOCAL_REPO_DESTINATION}/.git --work-tree=${LOCAL_REPO_DESTINATION}"
-    ${local_git} checkout ${TAG}
-    ${local_git} pull origin ${TAG}
+    git clone --branch ${TAG} --depth 1 ${REPO} ${LOCAL_REPO_DESTINATION}
 fi
 # Output: Repo available at ${LOCAL_REPO_DESTINATION}
+
+echo  "~~~~~~ Convert from Dos to Unix - in case format is in non-unix format ~~~~~~" > /dev/null
+pushd .
+cd ${LOCAL_REPO_DESTINATION}
+# -I         <== do not match pattern i binary files
+# -l         <== only show the matching file names
+# -e 'xxx'   <== match regex pattern
+git init
+git grep --cached -I -l -e $'\r' | xargs -n1 -I "{}" dos2unix "{}" || true
+popd
+# Output: Repo text files guaranteed to have unix LF as newline
 
 # Run the coverage
 COVERAGE_SCRIPT="${LOCAL_REPO_DESTINATION}/get_coverage_for_challenge.sh"

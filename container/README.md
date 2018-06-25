@@ -56,3 +56,22 @@ By running the `local-ecs` and then the Acceptance test, one will cover the:
 This testing does not cover language specific support. That should be covered by the container tests.
 
 
+## Debugging container
+
+To be able to interactively log into the container and debug the state or even run further commands manually we have the follow command:
+
+```
+    DEBUG=true ./runDockerContainer.sh [rest of the args]
+
+For e.g.
+    DEBUG=true ./runDockerContainer.sh hmmm participant round https://github.com/julianghionoiu/tdl-runner-hmmm TCH_R1/done TCH
+```
+
+Inside the container under `/debug-repo/` you can place any repo or file or folders - volume sharing between host and container environments.
+
+In case a repo is placed there, and would like to pass it to the `fetch_repo_and_collect_coverage.sh` command:
+```
+./fetch_repo_and_collect_coverage.sh hmmm participant round ../debug-repo/prod-issue/ master CHK
+                                                            ^^^^^^^ git repo (should have the .git folder)
+``` 
+In case the folder does not have a .git folder, create one by running `git init` inside that folder. 

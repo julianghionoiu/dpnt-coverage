@@ -7,12 +7,14 @@ RUN apt-get update && apt-get install -qy \
     git \
     libxml2-utils \
     jq \
+    dos2unix \
     --no-install-recommends && rm -r /var/lib/apt/lists/*
 RUN pip install awscli
 
-WORKDIR /srv
+ENV WORKDIR /srv
+WORKDIR ${WORKDIR}
 
-ENV SRCS_VERSION 0.0.12
+ENV SRCS_VERSION 0.0.15
 RUN wget https://github.com/julianghionoiu/dev-sourcecode-record/releases/download/v${SRCS_VERSION}/dev-sourcecode-record-${SRCS_VERSION}-all.jar \
     -O ${WORKDIR}/dev-sourcecode-record-all.jar
 
@@ -22,4 +24,4 @@ RUN wget https://github.com/julianghionoiu/tdl-interop-event-queue/releases/down
 
 COPY fetch_repo_and_collect_coverage.sh ${WORKDIR}
 
-ENTRYPOINT ./fetch_repo_and_collect_coverage.sh
+ENTRYPOINT ${WORKDIR}/fetch_repo_and_collect_coverage.sh
