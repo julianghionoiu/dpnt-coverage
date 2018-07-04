@@ -15,19 +15,19 @@ RUN apt-get update && apt-get install -qy \
     nunit-console  \
     gtk-sharp2
 
-RUN wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
-RUN mkdir -p /usr/lib/nuget/
-RUN cp nuget.exe                    /usr/lib/nuget/
-RUN ln -sf /usr/lib/nuget/nuget.exe /usr/bin/nuget
-RUN chmod +x /usr/bin/nuget
-
 COPY installBaboon.sh installBaboon.sh
 RUN ./installBaboon.sh
 ENV BABOON_HOME ${WORKDIR}/XR.Baboon/
 
-RUN mono                          --version
-RUN mcs                           --version
-RUN xbuild                        /version
-RUN msbuild                       /version
-RUN mono /usr/bin/nuget           help  | head -n1
-RUN nunit-console                 -help | head -n9
+RUN wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+RUN mkdir -p /usr/lib/nuget/
+RUN cp nuget.exe /usr/lib/nuget/
+RUN echo '#!/bin/bash\n mono /usr/lib/nuget/nuget.exe "$@"' > /usr/bin/nuget && \
+    chmod +x /usr/bin/nuget
+
+RUN mono          --version
+RUN mcs           --version
+RUN xbuild        /version
+RUN msbuild       /version
+RUN nuget         help  | head -n1
+RUN nunit-console -help | head -n9
