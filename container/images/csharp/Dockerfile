@@ -19,6 +19,7 @@ RUN wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
 RUN mkdir -p /usr/lib/nuget/
 RUN cp nuget.exe                    /usr/lib/nuget/
 RUN ln -sf /usr/lib/nuget/nuget.exe /usr/bin/nuget
+RUN chmod +x /usr/bin/nuget
 
 COPY installBaboon.sh installBaboon.sh
 RUN ./installBaboon.sh
