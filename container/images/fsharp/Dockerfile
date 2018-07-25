@@ -15,10 +15,6 @@ RUN apt-get update && apt-get install -qy \
     nunit-console  \
     fsharp
 
-COPY installBaboon.sh installBaboon.sh
-RUN ./installBaboon.sh
-ENV BABOON_HOME ${WORKDIR}/XR.Baboon/
-
 RUN wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
 RUN mkdir -p /usr/lib/nuget/
 RUN cp nuget.exe /usr/lib/nuget/
