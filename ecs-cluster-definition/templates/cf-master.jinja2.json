@@ -71,6 +71,7 @@
         "TaskDefinitionLangPython": {{ taskMacro.languageSpecificTask('python', '0.1') }},
         "TaskDefinitionLangRuby": {{ taskMacro.languageSpecificTask('ruby', '0.1') }},
         "TaskDefinitionLangScala": {{ taskMacro.languageSpecificTask('scala', '0.1') }},
-        "TaskDefinitionLangCSharp": {{ taskMacro.languageSpecificTask('csharp', '0.1') }}
+        "TaskDefinitionLangCSharp": {{ taskMacro.languageSpecificTask('csharp', '0.1') }},
+        "TaskDefinitionLangFSharp": {{ taskMacro.languageSpecificTask('fsharp', '0.1') }}
     }
 }
