@@ -4,7 +4,8 @@ FROM ${BASE_IMAGE}
 RUN uname -a
 
 RUN apt-get update && apt-get install -qy \
-    fsharp
+    fsharp \
+      --no-install-recommends && rm -r /var/lib/apt/lists/*
 
 RUN nuget install FSharp.Core -Version 4.5.0
 

@@ -4,7 +4,8 @@ FROM ${BASE_IMAGE}
 RUN uname -a
 
 RUN apt-get update && apt-get install -qy \
-    gtk-sharp2
+    gtk-sharp2 \
+        --no-install-recommends && rm -r /var/lib/apt/lists/*
 
 RUN mono          --version
 RUN mcs           --version

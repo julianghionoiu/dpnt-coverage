@@ -12,7 +12,8 @@ RUN apt-get update && apt-get install -qy \
     mono-devel     \
     mono-complete  \
     mono-profiler  \
-    nunit-console
+    nunit-console  \
+      --no-install-recommends && rm -r /var/lib/apt/lists/*
 
 RUN wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
 RUN mkdir -p /usr/lib/nuget/

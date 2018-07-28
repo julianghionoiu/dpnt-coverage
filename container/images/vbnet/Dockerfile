@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -qy \
     libmono-microsoft-visualbasic10.0-cil \
     mono-vbnc                             \
     mono-runtime                          \
-    mono-mcs
+    mono-mcs                              \
+      --no-install-recommends && rm -r /var/lib/apt/lists/*
 
 RUN mono          --version
 RUN vbnc          | head -n1
