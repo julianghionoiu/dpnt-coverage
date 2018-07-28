@@ -25,8 +25,9 @@ function die() { echo >&2 $1; exit 1; }
 
 echo "~~~~~~ Refreshing base image ~~~~~~"
 if [[ "${BASE}" == "base"  ]]; then
-    docker build -t ${BASE_IMAGE_TAG} "${IMAGES_DIR}/${BASE}/."
+    docker build -t ${ROOT_BASE_IMAGE_TAG} "${IMAGES_DIR}/base/."
 elif [[ "${BASE}" == "dotnet-base"  ]]; then
+    docker build -t ${ROOT_BASE_IMAGE_TAG} "${IMAGES_DIR}/base/."
     BASE_IMAGE_TAG=${DOTNET_BASE_IMAGE_TAG}
     docker build -t ${BASE_IMAGE_TAG} "${IMAGES_DIR}/${BASE}/." --build-arg BASE_IMAGE="${ROOT_BASE_IMAGE_TAG}"
 fi
