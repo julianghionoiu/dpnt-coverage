@@ -18,7 +18,8 @@ RUN apt-get update && apt-get install -qy \
     libmono-microsoft-visualbasic10.0-cil \
     mono-vbnc      \
     mono-runtime   \
-    mono-mcs
+    mono-mcs       \
+    xmlstarlet
 
 RUN wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
 RUN mkdir -p /usr/lib/nuget/
