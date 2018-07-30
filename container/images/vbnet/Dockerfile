@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -qy \
     mono-vbnc                             \
     mono-runtime                          \
     mono-mcs                              \
+    xmlstarlet                            \
       --no-install-recommends && rm -r /var/lib/apt/lists/*
 
 RUN mono          --version
