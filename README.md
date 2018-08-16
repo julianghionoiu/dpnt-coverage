@@ -104,7 +104,12 @@ Build package
 
 Invoke function manually
 ```
-SLS_DEBUG=* serverless invoke local --function srcs-github-export --path tdl/dpnt-sourcecode/src/test/resources/tdl/datapoint/sourcecode/sample_s3_event.json
+SLS_DEBUG=* serverless invoke local --function srcs-github-export --path ../dpnt-sourcecode/src/test/resources/tdl/datapoint/sourcecode/sample_s3_via_sns_event.json
+```
+or
+
+```
+SLS_DEBUG=* serverless invoke local --function srcs-github-export --path src/test/resources/tdl/datapoint/sourcecode/sample_s3_via_sns_event.json
 ```
 
 ## Container deployment
