@@ -1,4 +1,5 @@
 # dpnt-coverage
+
 Collect coverage from SRCS files
 
 - [Java](./container/images/java/)
@@ -34,9 +35,20 @@ The language container image needs to be build and tagged as `latest`:
 ```
 
 Start the local ECS simulator. The simulator will use the containers available in the local Docker registry.
+
+Try the below first:
+
+```bash 
+ping host.docker.internal
+```
+
+If there is response, run the below command:
+
 ```bash
 python local-ecs/ecs-server-wrapper.py start config/local.params.yml
 ```
+
+Otherwise see below:
 
 A note on the container networking. The container will attempt to call services on the docker host by using the `host.docker.internal` name.
 https://docs.docker.com/docker-for-mac/networking/#use-cases-and-workarounds. 
@@ -95,7 +107,7 @@ See the AWS ECR registry instructions on how to deploy a container into AWS
 
 ## Cluster deployment
 
-Define an environment by dupicating the configuration file in `./config`
+Define an environment by duplicating the configuration file in `./config`
 
 Trigger AWS CloudFormation to deploy or update an ECS Cluster
 ```
