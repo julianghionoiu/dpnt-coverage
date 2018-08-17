@@ -13,7 +13,11 @@ import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.jgit.api.Git;
-import tdl.datapoint.coverage.processing.*;
+import tdl.datapoint.coverage.processing.ECSCoverageTaskRunner;
+import tdl.datapoint.coverage.processing.Language;
+import tdl.datapoint.coverage.processing.LocalGitClient;
+import tdl.datapoint.coverage.processing.S3BucketEvent;
+import tdl.datapoint.coverage.processing.S3SrcsToGitExporter;
 import tdl.participant.queue.connector.SqsEventQueue;
 import tdl.participant.queue.events.ProgrammingLanguageDetectedEvent;
 
@@ -25,7 +29,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static tdl.datapoint.coverage.ApplicationEnv.*;
+import static tdl.datapoint.coverage.ApplicationEnv.ECS_ENDPOINT;
+import static tdl.datapoint.coverage.ApplicationEnv.ECS_REGION;
+import static tdl.datapoint.coverage.ApplicationEnv.ECS_TASK_CLUSTER;
+import static tdl.datapoint.coverage.ApplicationEnv.ECS_TASK_DEFINITION_PREFIX;
+import static tdl.datapoint.coverage.ApplicationEnv.ECS_TASK_LAUNCH_TYPE;
+import static tdl.datapoint.coverage.ApplicationEnv.ECS_VPC_ASSIGN_PUBLIC_IP;
+import static tdl.datapoint.coverage.ApplicationEnv.ECS_VPC_SECURITY_GROUP;
+import static tdl.datapoint.coverage.ApplicationEnv.ECS_VPC_SUBNET;
+import static tdl.datapoint.coverage.ApplicationEnv.S3_ENDPOINT;
+import static tdl.datapoint.coverage.ApplicationEnv.S3_REGION;
+import static tdl.datapoint.coverage.ApplicationEnv.SQS_ENDPOINT;
+import static tdl.datapoint.coverage.ApplicationEnv.SQS_QUEUE_URL;
+import static tdl.datapoint.coverage.ApplicationEnv.SQS_REGION;
 
 public class CoverageUploadHandler implements RequestHandler<Map<String, Object>, String> {
     private static final Logger LOG = Logger.getLogger(CoverageUploadHandler.class.getName());
@@ -153,6 +169,4 @@ public class CoverageUploadHandler implements RequestHandler<Map<String, Object>
                     participantId, challengeId, roundId, language, doneTag);
         }
     }
-
-
 }

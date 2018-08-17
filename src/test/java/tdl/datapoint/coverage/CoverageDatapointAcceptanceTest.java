@@ -31,6 +31,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class CoverageDatapointAcceptanceTest {
     private static final Context NO_CONTEXT = null;
+    private static final int WAIT_BEFORE_RETRY_IN_MILLIS = 2000;
+    private static final int TASK_FINISH_CHECK_RETRY_COUNT = 10;
 
     @Rule
     public EnvironmentVariables environmentVariables = new EnvironmentVariables();
@@ -138,8 +140,12 @@ public class CoverageDatapointAcceptanceTest {
 
     //~~~~~~~~~~ Helpers ~~~~~~~~~~~~~`
 
-    private static void waitForQueueToReceiveEvents() throws InterruptedException {
-        Thread.sleep(10000);
+    private void waitForQueueToReceiveEvents() throws InterruptedException {
+        int retryCtr = 0;
+        while ((coverageComputedEvents.size() < 2) && (retryCtr < TASK_FINISH_CHECK_RETRY_COUNT)) {
+            Thread.sleep(WAIT_BEFORE_RETRY_IN_MILLIS);
+            retryCtr++;
+        }
     }
 
     private static String generateId() {
