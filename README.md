@@ -34,6 +34,8 @@ The language container image needs to be build and tagged as `latest`:
 ./container/buildDockerImage.sh hmmm
 ```
 
+**Note: to avoid failing CoverageDatapointAcceptanceTest acceptance tests due to timeouts please follow the below instructions** 
+
 Start the local ECS simulator. The simulator will use the containers available in the local Docker registry.
 
 Try the below first:
@@ -89,7 +91,11 @@ python local-s3/minio-wrapper.py stop
 ## Packaging
 
 Install Serverless
+
+Ensure you have new version (v6.4.0) of `npm` installed, installing `serverless` fails with older versions of npm:
+ 
 ```
+npm install -g npm         (optional: to get to the latest version of npm)
 npm install -g serverless
 
 serverless info
