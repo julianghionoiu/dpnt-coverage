@@ -78,7 +78,7 @@ DOCKER_HOST_WITHIN_CONTAINER=n.n.n.n python local-ecs/ecs-server-wrapper.py star
 ### Run the acceptance test
 
 ```bash
-./gradlew --rerun-tasks test jacocoTestReport
+./gradlew --rerun-tasks test
 ```
 
 Stop dependencies
