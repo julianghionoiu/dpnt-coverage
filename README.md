@@ -108,14 +108,21 @@ Build package
 ./gradlew clean test shadowJar
 ```
 
+Setup environment variables
+
+```bash
+export ECS_ACCOUNT_ID=dev
+export AWS_PROFILE=befaster    # pre-configured profile contained in ~/.aws/credentials
+```
+
 Invoke function manually
 ```bash
-SLS_DEBUG=* serverless invoke local --function srcs-github-export --path ../dpnt-sourcecode/src/test/resources/tdl/datapoint/sourcecode/sample_s3_via_sns_event.json
+SLS_DEBUG=* serverless invoke local --function call-ecs-to-compute-coverage --path ../dpnt-sourcecode/src/test/resources/tdl/datapoint/sourcecode/sample_s3_via_sns_event.json
 ```
 or
 
 ```bash
-SLS_DEBUG=* serverless invoke local --function srcs-github-export --path src/test/resources/tdl/datapoint/sourcecode/sample_s3_via_sns_event.json
+SLS_DEBUG=* serverless invoke local --function call-ecs-to-compute-coverage --path src/test/resources/tdl/datapoint/coverage/sample_s3_via_sns_event.json
 ```
 
 ## Container deployment
@@ -155,6 +162,7 @@ Setup environment variables
 
 ```bash
 export ECS_ACCOUNT_ID=dev
+export AWS_PROFILE=befaster    # pre-configured profile contained in ~/.aws/credentials
 ```
 
 Deploy to DEV
