@@ -26,6 +26,7 @@ Start the local S3 and SQS simulators
 ```bash
 python local-sqs/elasticmq-wrapper.py start
 python local-s3/minio-wrapper.py start
+minio config host add myminio http://192.168.1.190:9000 local_test_access_key local_test_secret_key
 ```
 
 We use the `hmmm` language to test the application.
@@ -95,7 +96,7 @@ Install Serverless
 Ensure you have new version (v6.4.0) of `npm` installed, installing `serverless` fails with older versions of npm:
 
 ```bash
-npm install -g npm         # optional: to get to the latest version of npm
+npm install -g npm         # optional: to get the latest version of npm
 npm install -g serverless
 
 serverless info
@@ -108,11 +109,14 @@ Build package
 ./gradlew clean test shadowJar
 ```
 
-Setup environment variables
+Setup local bucket
 
 ```bash
-export ECS_ACCOUNT_ID=dev
-export AWS_PROFILE=befaster    # pre-configured profile contained in ~/.aws/credentials
+export AWS_PROFILE=befaster                      # pre-configured profile contained in ~/.aws/credentials
+
+minio mb myminio
+minio mb myminio/tdl-test-auth/TCH/user01/
+minio cp ./build/resources/test/HmmmLang_R1Cov33_R2Cov44.srcs myminio/tdl-test-auth/TCH/user01/test1.srcs
 ```
 
 Invoke function manually
@@ -124,6 +128,8 @@ or
 ```bash
 SLS_DEBUG=* serverless invoke local --function call-ecs-to-compute-coverage --path src/test/resources/tdl/datapoint/coverage/sample_s3_via_sns_event.json
 ```
+
+Note: the `sample_s3_via_sns_event.json` file contains the reference to the bucket `tdl-test-auth` and the key referring to the file at `TCH/user01/test1.srcs`.
 
 ## Container deployment
 
@@ -161,8 +167,7 @@ cp config/dev.params.yml config/live.params.yml
 Setup environment variables
 
 ```bash
-export ECS_ACCOUNT_ID=dev
-export AWS_PROFILE=befaster    # pre-configured profile contained in ~/.aws/credentials
+export AWS_PROFILE=befaster                        # pre-configured profile contained in ~/.aws/credentials
 ```
 
 Deploy to DEV
@@ -187,3 +192,5 @@ SLS_DEBUG=* serverless invoke --stage dev --function call-ecs-to-compute-coverag
 
 Check the destination queue for that particular environment.
 Check the ECS Task status and logs
+
+Note: the `sample_s3_via_sns_event.json` file contains the reference to the bucket `tdl-test-auth` and the key referring to the file at `TCH/user01/test1.srcs`.
