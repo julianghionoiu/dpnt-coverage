@@ -39,12 +39,12 @@ computeCoverageForChallenge() {
 
    if [[ "${actualResult}" = "${expectedResult}" ]]; then
       echo "Test passed"
-      testOutcome "Passed" "${language_id}" "${challenge_id}" "${expectedResult}" "${actualResult}"
+      testOutcome "Passed" "${language_id}" "${challenge_id}" "${expectedResult}" "${actualResult}" "${exitCode}"
    else
       echo "Test failed due to result mismatch"      1>&2
       echo "   Actual result: '${actualResult}'"     1>&2
       echo "   Expected result: '${expectedResult}'" 1>&2
-      testOutcome "Failed" "${language_id}" "${challenge_id}" "${expectedResult}" "${actualResult}"
+      testOutcome "Failed" "${language_id}" "${challenge_id}" "${expectedResult}" "${actualResult}" "${exitCode}"
    fi
 }
 
@@ -72,21 +72,25 @@ checkForFailingCoverageResults() {
 
    # then
    exitCode=$(cat "${exitCodeFile}")
-   if [[ ${exitCode} -ne 0 ]]; then
-      echo "Test failed due to non-zero exit code" 1>&2
-      echo "   Actual exit code: ${exitCode}"      1>&2
-      echo "   Expected exit code: 0"              1>&2
+   if [[ ${exitCode} = 0 ]]; then
+      echo "Test failed due to exit code of 0"  1>&2
+      echo "   Actual exit code: ${exitCode}"   1>&2
+      echo "   Expected exit code: non-zero"    1>&2
    fi
 
    if [[ "${actualResult}" = "${expectedResult}" ]]; then
       echo "Test passed"
-      testOutcome "Passed" "${language_id}" "${challenge_id}" "${expectedResult}" "${actualResult}"
+      testOutcome "Passed" "${language_id}" "${challenge_id}" "${expectedResult}" "${actualResult}" "${exitCode}"
    else
       echo "Test failed due to result mismatch"      1>&2
       echo "   Actual result: '${actualResult}'"     1>&2
       echo "   Expected result: '${expectedResult}'" 1>&2
-      testOutcome "Failed" "${language_id}" "${challenge_id}" "${expectedResult}" "${actualResult}"
+      testOutcome "Failed" "${language_id}" "${challenge_id}" "${expectedResult}" "${actualResult}" "${exitCode}"
    fi
+
+   echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+   echo "This test is expected to pass, as we are expecting a non-zero exit code returned by the docker container execution and an empty result"
+   echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 }
 
 testOutcome() {
@@ -95,11 +99,12 @@ testOutcome() {
     challenge_id="$3"
     expected="$4"
     actual="$5"
+    exitCode="$6"
 
     if [[ "${outcome}" = "Passed" ]]; then
-        passedTests+=("language=${language_id}|challenge=${challenge_id}|expected=${expected}|actual=${actual}")
+        passedTests+=("language=${language_id}|challenge=${challenge_id}|exitCode=${exitCode}|expected=${expected}|actual=${actual}")
     elif [[ "${outcome}" = "Failed" ]]; then
-        failedTests+=("language=${language_id}|challenge=${challenge_id}|expected=${expected}|actual=${actual}")
+        failedTests+=("language=${language_id}|challenge=${challenge_id}|exitCode=${exitCode}|expected=${expected}|actual=${actual}")
     fi
 }
 
