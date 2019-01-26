@@ -6,6 +6,8 @@ set -o pipefail
 passedTests=()
 failedTests=()
 
+exitCodeFile=$(mktemp)
+
 computeCoverageForChallenge() {
    # given
    SCRIPT_CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -24,11 +26,52 @@ computeCoverageForChallenge() {
    fi
 
    # when
-   actualResult=$( ${SCRIPT_CURRENT_DIR}/../../runDockerContainer.sh ${language_id} "participant" "round" ${repo} ${tag} ${challenge_id} | tail -1 )
+   actualResult=$( ( ${SCRIPT_CURRENT_DIR}/../../runDockerContainer.sh ${language_id} "participant" "round" ${repo} ${tag} ${challenge_id} | tail -1 && true); echo $? > "${exitCodeFile}" )
    actualResult=$(echo ${actualResult} | awk '{print coverage, $3}' | tr '="' ' ' | awk '{print $2}')
 
    # then
-   exitCode=$?
+   exitCode=$(cat "${exitCodeFile}")
+   if [[ ${exitCode} -ne 0 ]]; then
+      echo "Test failed due to non-zero exit code" 1>&2
+      echo "   Actual exit code: ${exitCode}"      1>&2
+      echo "   Expected exit code: 0"              1>&2
+   fi
+
+   if [[ "${actualResult}" = "${expectedResult}" ]]; then
+      echo "Test passed"
+      testOutcome "Passed" "${language_id}" "${challenge_id}" "${expectedResult}" "${actualResult}"
+   else
+      echo "Test failed due to result mismatch"      1>&2
+      echo "   Actual result: '${actualResult}'"     1>&2
+      echo "   Expected result: '${expectedResult}'" 1>&2
+      testOutcome "Failed" "${language_id}" "${challenge_id}" "${expectedResult}" "${actualResult}"
+   fi
+}
+
+checkForFailingCoverageResults() {
+   # given
+   SCRIPT_CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+   docker_image_suffix=$1
+   language_id=$2
+   tag=$3
+   repo="https://github.com/julianghionoiu/tdl-runner-${language_id}"
+   challenge_id="$4"
+   expectedResult="$5"
+
+   echo "~~~~~~~~~~~~~~~~ Starting test ~~~~~~~~~~~~~~~~~"
+   dockerImagePresent=$(docker images -q -f reference=accelerate-io/dpnt-coverage-${docker_image_suffix}:latest)
+   if [[ -z "${dockerImagePresent}" ]]; then
+      echo "Test failed during setup, due to failing to find docker image for ${language_id} language" 1>&2
+      testOutcome "Failed" "${language_id}" "${challenge_id}" "${expectedResult}" "No Docker Image"
+      return
+   fi
+
+   # when
+   actualResult=$( (${SCRIPT_CURRENT_DIR}/../../runDockerContainer.sh ${docker_image_suffix} "participant" "round" ${repo} ${tag} ${challenge_id} | tail -1 && true); echo $? > "${exitCodeFile}" )
+   actualResult=$(echo ${actualResult} | awk '{print coverage, $3}' | tr '="' ' ' | awk '{print $2}')
+
+   # then
+   exitCode=$(cat "${exitCodeFile}")
    if [[ ${exitCode} -ne 0 ]]; then
       echo "Test failed due to non-zero exit code" 1>&2
       echo "   Actual exit code: ${exitCode}"      1>&2
