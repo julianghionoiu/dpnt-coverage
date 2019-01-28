@@ -6,6 +6,8 @@ set -o pipefail
 passedTests=()
 failedTests=()
 
+exitCodeFile=$(mktemp)
+
 computeCoverageForChallenge() {
    # given
    SCRIPT_CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -24,11 +26,11 @@ computeCoverageForChallenge() {
    fi
 
    # when
-   actualResult=$( ${SCRIPT_CURRENT_DIR}/../../runDockerContainer.sh ${language_id} "participant" "round" ${repo} ${tag} ${challenge_id} | tail -1 )
+   actualResult=$( ( ${SCRIPT_CURRENT_DIR}/../../runDockerContainer.sh ${language_id} "participant" "round" ${repo} ${tag} ${challenge_id} | tail -1 && true); echo $? > "${exitCodeFile}" )
    actualResult=$(echo ${actualResult} | awk '{print coverage, $3}' | tr '="' ' ' | awk '{print $2}')
 
    # then
-   exitCode=$?
+   exitCode=$(cat "${exitCodeFile}")
    if [[ ${exitCode} -ne 0 ]]; then
       echo "Test failed due to non-zero exit code" 1>&2
       echo "   Actual exit code: ${exitCode}"      1>&2
@@ -37,12 +39,12 @@ computeCoverageForChallenge() {
 
    if [[ "${actualResult}" = "${expectedResult}" ]]; then
       echo "Test passed"
-      testOutcome "Passed" "${language_id}" "${challenge_id}" "${expectedResult}" "${actualResult}"
+      testOutcome "Passed" "${language_id}" "${challenge_id}" "${expectedResult}" "${actualResult}" "${exitCode}"
    else
       echo "Test failed due to result mismatch"      1>&2
       echo "   Actual result: '${actualResult}'"     1>&2
       echo "   Expected result: '${expectedResult}'" 1>&2
-      testOutcome "Failed" "${language_id}" "${challenge_id}" "${expectedResult}" "${actualResult}"
+      testOutcome "Failed" "${language_id}" "${challenge_id}" "${expectedResult}" "${actualResult}" "${exitCode}"
    fi
 }
 
@@ -52,11 +54,12 @@ testOutcome() {
     challenge_id="$3"
     expected="$4"
     actual="$5"
+    exitCode="$6"
 
     if [[ "${outcome}" = "Passed" ]]; then
-        passedTests+=("language=${language_id}|challenge=${challenge_id}|expected=${expected}|actual=${actual}")
+        passedTests+=("language=${language_id}|challenge=${challenge_id}|exitCode=${exitCode}|expected=${expected}|actual=${actual}")
     elif [[ "${outcome}" = "Failed" ]]; then
-        failedTests+=("language=${language_id}|challenge=${challenge_id}|expected=${expected}|actual=${actual}")
+        failedTests+=("language=${language_id}|challenge=${challenge_id}|exitCode=${exitCode}|expected=${expected}|actual=${actual}")
     fi
 }
 
