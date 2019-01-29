@@ -9,6 +9,7 @@ source ${SCRIPT_CURRENT_DIR}/../test-framework/test-coverage-functions.sh
 computeCoverageForChallenge "fsharp" "master" "SUM" "100"
 computeCoverageForChallenge "fsharp" "master" "TST" "50"
 computeCoverageForChallenge "fsharp" "master" "CHK" "0"
-computeCoverageForChallenge "fsharp" "master" "xyz" "0"
+
+checkForFailingCoverageResults "fsharp" "master" "xyz" ""
 
 displayPassFailSummary
