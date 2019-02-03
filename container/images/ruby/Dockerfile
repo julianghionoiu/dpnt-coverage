@@ -31,7 +31,16 @@ RUN apt-get update && apt-get install -qy \
     --no-install-recommends && rm -r /var/lib/apt/lists/*
 
 # Install RVM
-RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3
+
+### These two gpg commands failed
+# RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3
+# RUN gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+
+### Hence, running the below, two, as recommend by gpg in the failure message
+
+RUN curl -sSL https://rvm.io/mpapis.asc | gpg --import -
+RUN curl -sSL https://rvm.io/pkuczynski.asc | gpg --import -
+
 RUN curl -L get.rvm.io | bash -s stable
 ENV RVM_PATH  /usr/local/rvm
 ENV PATH      ${RVM_PATH}/bin:${PATH}
@@ -47,7 +56,8 @@ RUN rvm info
 
 # Install BUNDLER
 RUN echo 'gem: --no-ri --no-rdoc' > ~/.gemrc
-RUN gem install bundler --no-ri --no-rdoc
+### Update the version for bundler to 1.17.3 as recommended by gem in its failure message
+RUN gem install bundler -v 1.17.3 --no-ri --no-rdoc
 
 # Precache dependencies for faster run
 RUN wget https://raw.githubusercontent.com/julianghionoiu/tdl-runner-ruby/master/Gemfile \
