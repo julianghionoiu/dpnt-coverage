@@ -1,13 +1,7 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE} as baseImage
 
-FROM python:3.7
-
-COPY --from=baseImage /usr/lib/jvm/ /usr/lib/jvm/
-COPY --from=baseImage /usr/bin/     /usr/bin/
-COPY --from=baseImage /usr/lib/     /usr/lib/
-COPY --from=baseImage /usr/share/   /usr/share/
-COPY --from=baseImage /srv          /srv
+COPY --from=python:3.7 / /
 
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
 RUN ln -sf ${JAVA_HOME}/bin/java /usr/bin/java
@@ -22,6 +16,6 @@ WORKDIR ${WORKDIR}
 # Precache dependencies for faster run - will populate the Pip cache
 RUN wget https://raw.githubusercontent.com/julianghionoiu/tdl-runner-python/master/requirements.txt \
     -O /tmp/requirements.precache && \
-    pip install -r /tmp/requirements.precache
+    pip install -r /tmp/requirements.precache || true
 
-ENTRYPOINT ${WORKDIR}/fetch_repo_and_collect_coverage.sh  
+ENTRYPOINT ${WORKDIR}/fetch_repo_and_collect_coverage.sh
