@@ -1,8 +1,13 @@
 FROM java:8u111-jdk
 RUN update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
 
+COPY --from=python:3.7 / /
+
+RUN python --version
+RUN pip --version
+RUN java -version
+
 RUN apt-get update && apt-get install -qy \
-    python-pip \
     groff-base \
     git \
     libxml2-utils \
