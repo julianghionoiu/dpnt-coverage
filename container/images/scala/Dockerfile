@@ -1,6 +1,8 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
+RUN apt-get update && apt-get install -f
+
 ENV SCALA_VERSION 2.12.3
 ENV SBT_VERSION 0.13.8
 # Install Scala
