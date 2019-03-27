@@ -32,7 +32,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class CoverageDatapointAcceptanceTest {
     private static final Context NO_CONTEXT = null;
     private static final int WAIT_BEFORE_RETRY_IN_MILLIS = 2000;
-    private static final int TASK_FINISH_CHECK_RETRY_COUNT = 10;
+    private static final int TASK_FINISH_CHECK_RETRY_COUNT = 20;
 
     @Rule
     public EnvironmentVariables environmentVariables = new EnvironmentVariables();
