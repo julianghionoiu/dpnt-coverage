@@ -1,21 +1,23 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-ENV SCALA_VERSION 2.12.3
-ENV SBT_VERSION 0.13.9
+ENV SCALA_VERSION 2.12.8
+
 # Install Scala
-## Piping curl directly in tar
-RUN \
-  curl -fsL https://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz | tar xfz - -C /root/ && \
-  echo >> /root/.bashrc && \
-  echo "export PATH=~/scala-$SCALA_VERSION/bin:$PATH" >> /root/.bashrc
+## Installing openjdk-8-jdk to prevent the jre-headless or jdk-headless errors from occurring
+RUN apt-get --fix-broken install
+RUN apt-get update && apt-get install -qy openjdk-8-jdk
+
+RUN wget www.scala-lang.org/files/archive/scala-$SCALA_VERSION.deb
+RUN dpkg -i scala-$SCALA_VERSION.deb
+RUN scala -version
 
 # Install sbt
-RUN \
-  wget -c https://bintray.com/artifact/download/sbt/debian/sbt-$SBT_VERSION.deb && \
-  dpkg -i sbt-$SBT_VERSION.deb && \
-  rm sbt-$SBT_VERSION.deb && \
-  apt-get install sbt
+## Not downloading a fixed version but expecting debian to give us one
+RUN echo "deb https://dl.bintray.com/sbt/debian /" | tee -a /etc/apt/sources.list.d/sbt.list
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823
+RUN apt-get install apt-transport-https
+RUN apt-get update && apt-get install sbt
 
 # Precache dependencies for faster run - will populate the IVY cache
 ENV SBT_BUILD_TMP /tmp/sbt
