@@ -1,5 +1,11 @@
 FROM buildpack-deps:stretch-scm
 
+# Install python 3.7 by copy installed layers from another image
+COPY --from=python:3.7 / /
+
+RUN python3 --version
+RUN pip --version
+
 # Install Java 8
 COPY --from=java:8u111-jdk /usr/lib/jvm /usr/lib/jvm
 
@@ -11,8 +17,7 @@ RUN echo "PATH=${PATH}"
 
 RUN rm -fr /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install --fix-missing && apt-get install -qy \
-    python3-pip \
+RUN apt-get install --fix-missing && apt-get update && apt-get install -qy \
     groff-base \
     git \
     libxml2-utils \
@@ -20,11 +25,6 @@ RUN apt-get update && apt-get install --fix-missing && apt-get install -qy \
     dos2unix \
     --no-install-recommends && rm -r /var/lib/apt/lists/*
 
-RUN python3 --version
-RUN python3 -m pip install --upgrade pip
-RUN pip --version
-
-RUN python3 -m pip install --user setuptools
 RUN pip install --user setuptools awscli
 
 ENV WORKDIR /srv
