@@ -38,8 +38,8 @@ RUN apt-get update && apt-get install -qy \
 
 ### Hence, running the below, two, as recommend by gpg in the failure message
 
-RUN curl -sSL https://rvm.io/mpapis.asc | gpg --import -
-RUN curl -sSL https://rvm.io/pkuczynski.asc | gpg --import -
+RUN curl -sSL https://rvm.io/mpapis.asc | gpg --no-tty --import -
+RUN curl -sSL https://rvm.io/pkuczynski.asc | gpg --no-tty --import -
 
 RUN curl -L get.rvm.io | bash -s stable
 ENV RVM_PATH  /usr/local/rvm

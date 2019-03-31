@@ -1,8 +1,6 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE} as baseImage
 
-COPY --from=python:3.7 / /
-
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
 RUN ln -sf ${JAVA_HOME}/bin/java /usr/bin/java
 

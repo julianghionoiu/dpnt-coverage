@@ -1,15 +1,31 @@
-FROM java:8u111-jdk
-RUN update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+FROM buildpack-deps:stretch-scm
 
-RUN apt-get update && apt-get install -qy \
-    python-pip \
+# Install python 3.7 by copy installed layers from another image
+COPY --from=python:3.7 / /
+
+RUN python3 --version
+RUN pip --version
+
+# Install Java 8
+COPY --from=java:8u111-jdk /usr/lib/jvm /usr/lib/jvm
+
+ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
+ENV PATH=${JAVA_HOME}/bin:${PATH}
+
+RUN echo "JAVA_HOME=${JAVA_HOME}"
+RUN echo "PATH=${PATH}"
+
+RUN rm -fr /var/lib/apt/lists/*
+
+RUN apt-get install --fix-missing && apt-get update && apt-get install -qy \
     groff-base \
     git \
     libxml2-utils \
     jq \
     dos2unix \
     --no-install-recommends && rm -r /var/lib/apt/lists/*
-RUN pip install awscli
+
+RUN pip install --user setuptools awscli
 
 ENV WORKDIR /srv
 WORKDIR ${WORKDIR}
