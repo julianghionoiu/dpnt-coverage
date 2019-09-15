@@ -54,10 +54,14 @@ cd ${LOCAL_REPO_DESTINATION}
 # Re-initialise repo, the dest might be a SRCS file
 git init
 git add --all
+# Convert line endings
 # -I         <== do not match pattern i binary files
 # -l         <== only show the matching file names
 # -e 'xxx'   <== match regex pattern
 git grep --cached -I -l -e $'\r' | xargs -n1 -I "{}" dos2unix "{}" || true
+# Sanitize files that might begin with a failed BOM(Byte Order Mark) which results in a ? at the beginning of the file
+# - use sed to remove the question mark at the beggining of the line
+git grep --cached -I -l -e $'^?' | xargs -n1 -I "{}" sed -i '1s/^?//' "{}" || true
 popd
 # Output: Repo text files guaranteed to have unix LF as newline
 
