@@ -14,9 +14,9 @@ RUN apt-get update && apt-get install -qy \
       --no-install-recommends && rm -r /var/lib/apt/lists/*
 
 RUN mono          --version
-RUN vbnc          | head -n1
-RUN vbc           | head -n1
+RUN vbnc          2>&1 | head -n1
+RUN vbc           2>&1 | head -n1
 RUN xbuild        /version
 RUN msbuild       /version
-RUN nuget         help  | head -n1
-RUN nunit-console -help | head -n9
+RUN nuget         help  2>&1 | head -n1
+RUN nunit-console -help  2>&1 | head -n9

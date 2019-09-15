@@ -58,6 +58,11 @@ This testing does not cover language specific support. That should be covered by
 
 ## Debugging container
 
+Once the container is stop the logs can be viewed with:
+```
+docker logs <container_id>
+```
+
 To be able to interactively log into the container and debug the state or even run further commands manually we have the follow command:
 
 ```

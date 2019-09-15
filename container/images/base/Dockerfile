@@ -25,12 +25,12 @@ RUN apt-get install --fix-missing && apt-get update && apt-get install -qy \
     dos2unix \
     --no-install-recommends && rm -r /var/lib/apt/lists/*
 
-RUN pip install --user setuptools awscli
+RUN pip install setuptools awscli
 
 ENV WORKDIR /srv
 WORKDIR ${WORKDIR}
 
-ENV SRCS_VERSION 0.0.15
+ENV SRCS_VERSION 0.0.23
 RUN wget https://github.com/julianghionoiu/dev-sourcecode-record/releases/download/v${SRCS_VERSION}/dev-sourcecode-record-${SRCS_VERSION}-all.jar \
     -O ${WORKDIR}/dev-sourcecode-record-all.jar
 

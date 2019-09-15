@@ -55,9 +55,9 @@ ENV PATH      ${RUBY_PATH}/bin:${GEM_HOME}/bin:${PATH}
 RUN rvm info
 
 # Install BUNDLER
-RUN echo 'gem: --no-ri --no-rdoc' > ~/.gemrc
+RUN echo 'gem: --no-document' > ~/.gemrc
 ### Update the version for bundler to 1.17.3 as recommended by gem in its failure message
-RUN gem install bundler -v 1.17.3 --no-ri --no-rdoc
+RUN gem install bundler -v 1.17.3 --no-document
 
 # Precache dependencies for faster run
 RUN wget https://raw.githubusercontent.com/julianghionoiu/tdl-runner-ruby/master/Gemfile \

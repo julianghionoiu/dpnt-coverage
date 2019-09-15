@@ -13,5 +13,5 @@ RUN mono          --version
 RUN fsharpc | head -n1
 RUN xbuild        /version
 RUN msbuild       /version
-RUN nuget         help  | head -n1
-RUN nunit-console -help | head -n9
+RUN nuget         help  2>&1 | head -n1
+RUN nunit-console -help  2>&1 | head -n9
