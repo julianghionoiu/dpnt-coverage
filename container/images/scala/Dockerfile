@@ -6,7 +6,7 @@ ENV SCALA_VERSION 2.12.8
 # Install Scala
 ## Installing openjdk-8-jdk to prevent the jre-headless or jdk-headless errors from occurring
 RUN apt-get --fix-broken install
-RUN apt-get update && apt-get install -qy openjdk-8-jdk
+RUN apt-get update && apt-get install -qy openjdk-11-jdk
 
 RUN wget www.scala-lang.org/files/archive/scala-$SCALA_VERSION.deb
 RUN dpkg -i scala-$SCALA_VERSION.deb
