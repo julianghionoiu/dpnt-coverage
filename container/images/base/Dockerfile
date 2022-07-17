@@ -1,7 +1,7 @@
 FROM buildpack-deps:stretch-scm
 
-# Install python 3.7 by copy installed layers from another image
-COPY --from=python:3.7 / /
+# Install python 3.10 by copy installed layers from another image
+COPY --from=python:3.10 / /
 
 RUN python3 --version
 RUN pip --version
