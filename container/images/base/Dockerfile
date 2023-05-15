@@ -1,15 +1,15 @@
-FROM buildpack-deps:stretch-scm
+FROM buildpack-deps:bullseye-scm
 
 # Install python 3.10 by copy installed layers from another image
-COPY --from=python:3.10 / /
+COPY --from=python:3.10.11-bullseye /. /.
 
 RUN python3 --version
 RUN pip --version
 
-# Install Java 8
-COPY --from=openjdk:8u222-jdk-slim /usr/local/openjdk-8 /usr/local/openjdk-8
+# Install Java 17
+COPY --from=openjdk:17-jdk-slim-bullseye /usr/local/openjdk-17 /usr/local/openjdk-17
 
-ENV JAVA_HOME=/usr/local/openjdk-8
+ENV JAVA_HOME=/usr/local/openjdk-17
 ENV PATH=${JAVA_HOME}/bin:${PATH}
 
 RUN echo "JAVA_HOME=${JAVA_HOME}"

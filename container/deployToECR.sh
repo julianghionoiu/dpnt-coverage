@@ -14,7 +14,7 @@ LANGUAGE_ID=$1
 ECR_URL=$2
 
 echo "Logging into AWS ECR"
-`aws ecr get-login --no-include-email --region eu-west-1`
+aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin $ECR_URL
 
 echo "Compute language specific name+version"
 language_image_version=$( cat "${SCRIPT_CURRENT_DIR}/images/${LANGUAGE_ID}/version.txt" | tr -d " " | tr -d "\n" )

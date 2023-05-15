@@ -1,16 +1,16 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-RUN apt-get update && apt-get install -qy \
-    maven \
-    gradle \
-    --no-install-recommends && rm -r /var/lib/apt/lists/*
-
 # Precache dependencies for faster run - will populate the Maven cache
-RUN wget https://raw.githubusercontent.com/julianghionoiu/tdl-runner-java/master/build.gradle \
-    -O /tmp/build.gradle && \
-    gradle --build-file /tmp/build.gradle dependencies
+RUN mkdir -p /tmp/gradle/wrapper
+ARG JAVA_RUNNER_REPO=https://raw.githubusercontent.com/julianghionoiu/tdl-runner-java/master
+ADD ${JAVA_RUNNER_REPO}/gradle/wrapper/gradle-wrapper.properties /tmp/gradle/wrapper/gradle-wrapper.properties
+ADD ${JAVA_RUNNER_REPO}/gradle/wrapper/gradle-wrapper.jar /tmp/gradle/wrapper/gradle-wrapper.jar
+ADD ${JAVA_RUNNER_REPO}/gradlew /tmp/gradlew
+ADD ${JAVA_RUNNER_REPO}/build.gradle /tmp/build.gradle
+RUN chmod a+x /tmp/gradlew
 
-RUN echo "JAVA_HOME=${JAVA_HOME}"
-RUN echo "PATH=${PATH}"
-RUN java -version
+WORKDIR /tmp
+RUN ./gradlew --version
+RUN ./gradlew dependencies
+WORKDIR ${WORKDIR}

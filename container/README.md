@@ -80,3 +80,6 @@ In case a repo is placed there, and would like to pass it to the `fetch_repo_and
                                                             ^^^^^^^ git repo (should have the .git folder)
 ``` 
 In case the folder does not have a .git folder, create one by running `git init` inside that folder. 
+
+# Deploying to ECR
+

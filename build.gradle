@@ -14,10 +14,8 @@ buildscript {
 apply plugin: 'java'
 
 repositories {
+    mavenLocal()
     mavenCentral()
-    maven {
-        url "https://dl.bintray.com/julianghionoiu/maven"
-    }
 }
 
 sourceCompatibility = 1.8
@@ -29,7 +27,8 @@ dependencies {
             'com.amazonaws:aws-lambda-java-log4j:1.0.0',
             'com.amazonaws:aws-java-sdk-s3:1.11.254',
             'com.amazonaws:aws-java-sdk-ecs:1.11.331',
-            'ro.ghionoiu:queue-client:0.1.17',
+            // Bintray is gone, had to use the local Maven cache, see tdl-interop-event-queue on how to build
+            'ro.ghionoiu:queue-client:0.1.23',
 
             'org.eclipse.jgit:org.eclipse.jgit:4.8.0.201706111038-r',
             'org.eclipse.jgit:org.eclipse.jgit.archive:4.8.0.201706111038-r',

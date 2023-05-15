@@ -24,9 +24,8 @@ git submodule update --init
 
 Start the local S3 and SQS simulators
 ```bash
-python local-sqs/elasticmq-wrapper.py start
-python local-s3/minio-wrapper.py start
-minio config host add myminio http://192.168.1.190:9000 local_test_access_key local_test_secret_key
+python3 local-sqs/elasticmq-wrapper.py start
+python3 local-s3/minio-wrapper.py start
 ```
 
 We use the `hmmm` language to test the application.
@@ -79,6 +78,7 @@ DOCKER_HOST_WITHIN_CONTAINER=n.n.n.n python local-ecs/ecs-server-wrapper.py star
 ### Run the acceptance test
 
 ```bash
+export JAVA_HOME=$(/usr/libexec/java_home -v "1.8.0_302")
 ./gradlew --rerun-tasks test
 ```
 

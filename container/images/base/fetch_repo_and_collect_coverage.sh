@@ -15,6 +15,8 @@ function ensure_env {
     if [ -z "${!1+x}" ]; then echo "Environment variable $1 not set"; exit 1; fi
 }
 
+
+
 WORK_DIR=${SCRIPT_CURRENT_DIR}
 
 ensure_env "S3_ENDPOINT"
