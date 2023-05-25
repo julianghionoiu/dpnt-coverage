@@ -96,10 +96,19 @@ Install Serverless
 Ensure you have new version (v6.4.0) of `npm` installed, installing `serverless` fails with older versions of npm:
 
 ```bash
-npm install -g npm         # optional: to get the latest version of npm
-npm install -g serverless
+brew install nvm
 
-serverless info
+# add to ~/.bash_locations
+. /usr/local/Cellar/nvm/0.39.1_1/nvm.sh
+
+# Install the node version we know serverless works with
+nvm install v12.13.0
+
+# Install serverless 
+npm install serverless@3.31.0
+
+serverless --version
+serverless info --stage dev
 ```
 
 ## Local testing
@@ -187,7 +196,22 @@ Set the bucket and the key to some meaningful values.
 
 Invoke the dev lambda
 ```bash
-SLS_DEBUG=* serverless invoke --stage dev --function call-ecs-to-compute-coverage --path src/test/resources/tdl/datapoint/coverage/sample_s3_via_sns_event.json
+TEST_INPUT_SRCS="TCH/user01/test1.srcs"
+
+PAYLOAD_FILE=$(mktemp)
+cat << EOF > ${PAYLOAD_FILE}
+{
+  "Records": [
+    {
+      "Sns": {
+        "Message": "{\"Records\":[{\"s3\":{\"bucket\":{\"name\":\"tdl-test-auth\"},\"object\":{\"key\":\"${TEST_INPUT_SRCS}\"}}}]}"
+      }
+    }
+  ]
+}
+EOF
+
+SLS_DEBUG=* serverless invoke --stage dev --function call-ecs-to-compute-coverage --path ${PAYLOAD_FILE} --log
 ```
 
 Check the destination queue for that particular environment.
