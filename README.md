@@ -84,9 +84,9 @@ export JAVA_HOME=$(/usr/libexec/java_home -v "1.8.0_302")
 
 Stop dependencies
 ```bash
-python local-sqs/elasticmq-wrapper.py stop
-python local-ecs/ecs-server-wrapper.py stop
-python local-s3/minio-wrapper.py stop
+python3 local-sqs/elasticmq-wrapper.py stop
+python3 local-ecs/ecs-server-wrapper.py stop
+python3 local-s3/minio-wrapper.py stop
 ```
 
 ## Packaging
