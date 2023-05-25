@@ -14,6 +14,7 @@ public enum Language {
     VBNET("vbnet", Arrays.asList("VB", "VB.NET"), "Visual Basic"),
     JAVA("java", "Java"),
     SCALA("scala", "Scala"),
+    KOTLIN("kotlin", "Kotlin"),
     RUBY("ruby", "Ruby"),
     PYTHON("python", "Python"),
     JAVASCRIPT("nodejs", Arrays.asList("Javascript", "JS"), "Javascript"),

@@ -196,7 +196,7 @@ Set the bucket and the key to some meaningful values.
 
 Invoke the dev lambda
 ```bash
-TEST_INPUT_SRCS="TCH/user01/test1.srcs"
+TEST_INPUT_SRCS="HLO/julian_2505/sourcecode_20230525T215055.srcs"
 
 PAYLOAD_FILE=$(mktemp)
 cat << EOF > ${PAYLOAD_FILE}
