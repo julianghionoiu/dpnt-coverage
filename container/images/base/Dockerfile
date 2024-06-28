@@ -1,7 +1,7 @@
 FROM buildpack-deps:bullseye-scm
 
 # Install python 3.10 by copy installed layers from another image
-COPY --from=python:3.10.11-bullseye /. /.
+COPY --from=python:3.12.4-bullseye /. /.
 
 RUN python3 --version
 RUN pip --version
