@@ -1,5 +1,5 @@
 ARG BASE_IMAGE
-FROM ${BASE_IMAGE}
+FROM --platform=linux/amd64 ${BASE_IMAGE}
 
 ENV NVM_DIR /root/.nvm
 ENV NVM_VERSION 0.34.0

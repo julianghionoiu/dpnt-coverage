@@ -25,11 +25,11 @@ function die() { echo >&2 $1; exit 1; }
 
 echo "~~~~~~ Refreshing base image ~~~~~~"
 if [[ "${BASE}" == "base"  ]]; then
-    docker build -t ${ROOT_BASE_IMAGE_TAG} "${IMAGES_DIR}/base/."
+    docker build --platform linux/amd64 -t ${ROOT_BASE_IMAGE_TAG} "${IMAGES_DIR}/base/."
 elif [[ "${BASE}" == "dotnet-base"  ]]; then
-    docker build -t ${ROOT_BASE_IMAGE_TAG} "${IMAGES_DIR}/base/."
+    docker build --platform linux/amd64 -t ${ROOT_BASE_IMAGE_TAG} "${IMAGES_DIR}/base/."
     BASE_IMAGE_TAG=${DOTNET_BASE_IMAGE_TAG}
-    docker build -t ${BASE_IMAGE_TAG} "${IMAGES_DIR}/${BASE}/." --build-arg BASE_IMAGE="${ROOT_BASE_IMAGE_TAG}"
+    docker build --platform linux/amd64 -t ${ROOT_BASE_IMAGE_TAG} -t ${BASE_IMAGE_TAG} "${IMAGES_DIR}/${BASE}/." --build-arg BASE_IMAGE="${ROOT_BASE_IMAGE_TAG}"
 fi
 
 echo "Compute language specific name+version"
@@ -38,7 +38,7 @@ language_image_name="${DEFAULT_IMAGE_PREFIX}${LANGUAGE_ID}"
 language_image_tag="${language_image_name}:${language_image_version}"
 
 echo "~~~~~~ Building language specific image ~~~~~~"
-docker build -t ${language_image_tag} --build-arg BASE_IMAGE="${BASE_IMAGE_TAG}" \
+docker build --platform linux/amd64 -t ${language_image_tag} --build-arg BASE_IMAGE="${BASE_IMAGE_TAG}" \
     "${IMAGES_DIR}/${LANGUAGE_ID}/."
 
 echo "Make the current image the latest"

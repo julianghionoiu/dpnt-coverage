@@ -1,5 +1,5 @@
 ARG BASE_IMAGE
-FROM ${BASE_IMAGE}
+FROM --platform=linux/amd64 ${BASE_IMAGE}
 
 # Precache dependencies for faster run - will populate the Maven cache
 RUN mkdir -p /tmp/gradle/wrapper
