@@ -1,0 +1,20 @@
+S3_ENDPOINT: "https://s3.eu-west-2.amazonaws.com"
+S3_REGION: "eu-west-2"
+S3_BUCKET_ARN: "arn:aws:s3:::tdl-official-videos"
+
+ECR_BASE_URL: "577770582757.dkr.ecr.eu-west-1.amazonaws.com"
+
+ECS_ENDPOINT: "ecs.eu-west-1.amazonaws.com"
+ECS_REGION: "eu-west-1"
+ECS_ACCOUNT_ID: "577770582757"
+ECS_TASK_CLUSTER: "dpnt-coverage-live"
+ECS_TASK_DEFINITION_PREFIX: "dpnt-coverage-live-"
+ECS_TASK_LAUNCH_TYPE: "FARGATE"
+ECS_VPC_SUBNET: "subnet-cf2386b9"
+ECS_VPC_SECURITY_GROUP: "sg-ee159989"
+ECS_VPC_ASSIGN_PUBLIC_IP: "ENABLED"
+
+SQS_ENDPOINT: "https://sqs.eu-west-1.amazonaws.com"
+SQS_REGION: "eu-west-1"
+SQS_QUEUE_URL: "https://sqs.eu-west-1.amazonaws.com/577770582757/participant-events"
+SQS_QUEUE_ARN: "arn:aws:sqs:eu-west-1:577770582757:participant-events"
