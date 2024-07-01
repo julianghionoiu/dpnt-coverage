@@ -149,6 +149,13 @@ See the AWS ECR registry instructions on how to deploy a container into AWS
 
 Define an environment by duplicating the configuration file in `./config`
 
+Get a Python env configured
+```shell
+python3 -m venv venv
+. venv/bin/activate
+pip install -r requirements.txt
+```
+
 Trigger AWS CloudFormation to deploy or update an ECS Cluster
 ```bash
 ./ecs-cluster-definition/deploy.sh dev

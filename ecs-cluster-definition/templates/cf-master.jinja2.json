@@ -69,7 +69,7 @@
         "TaskDefinitionLangJava": {{ taskMacro.languageSpecificTask('java', '0.3') }},
         "TaskDefinitionLangKotlin": {{ taskMacro.languageSpecificTask('kotlin', '0.1') }},
         "TaskDefinitionLangNodejs": {{ taskMacro.languageSpecificTask('nodejs', '0.2') }},
-        "TaskDefinitionLangPython": {{ taskMacro.languageSpecificTask('python', '0.4') }},
+        "TaskDefinitionLangPython": {{ taskMacro.languageSpecificTask('python', '0.5') }},
         "TaskDefinitionLangRuby": {{ taskMacro.languageSpecificTask('ruby', '0.2') }},
         "TaskDefinitionLangScala": {{ taskMacro.languageSpecificTask('scala', '0.2') }},
         "TaskDefinitionLangCSharp": {{ taskMacro.languageSpecificTask('csharp', '0.2') }},

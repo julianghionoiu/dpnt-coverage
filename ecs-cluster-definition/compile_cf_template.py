@@ -12,17 +12,17 @@ def compile_and_save_to_file(_stage, _params_file, _destination_file):
     j2_env = Environment(loader=FileSystemLoader(TEMPLATE_DIR),
                          undefined=StrictUndefined,
                          trim_blocks=True)
-    print "Load parameters from: " + _params_file
+    print("Load parameters from: " + _params_file)
     with open(_params_file, 'r') as stream:
-        params = yaml.load(stream)
+        params = yaml.safe_load(stream)
 
     # Add computed params
     params["STAGE"] = _stage
     params["CLUSTER_NAME"] = "dpnt-coverage-"+_stage
 
-    print "Compiling cloudformation template"
+    print("Compiling cloudformation template")
     output = j2_env.get_template('cf-master.jinja2.json').render(**params)
-    print "Saving output to file: " + _destination_file
+    print("Saving output to file: " + _destination_file)
     with open(_destination_file, 'w') as f:
         f.write(output)
 
