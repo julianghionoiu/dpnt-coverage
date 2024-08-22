@@ -25,5 +25,5 @@ ecr_remote_tag="${ECR_URL}/${language_image_name}:${language_image_version}"
 echo "Tag image"
 docker tag ${language_image_tag} ${ecr_remote_tag}
 
-echo "Push image to ECR"
+echo "Push image to ECR"``
 docker push ${ecr_remote_tag}

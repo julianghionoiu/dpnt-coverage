@@ -9,6 +9,7 @@ RUN wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod
 
 RUN apt-get update && apt-get install -qy \
     dotnet-sdk-8.0 \
+    bc \
     --no-install-recommends && rm -r /var/lib/apt/lists/*
 
 RUN dotnet --version
