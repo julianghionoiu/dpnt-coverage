@@ -72,8 +72,8 @@
         "TaskDefinitionLangPython": {{ taskMacro.languageSpecificTask('python', '0.5') }},
         "TaskDefinitionLangRuby": {{ taskMacro.languageSpecificTask('ruby', '0.2') }},
         "TaskDefinitionLangScala": {{ taskMacro.languageSpecificTask('scala', '0.2') }},
-        "TaskDefinitionLangCSharp": {{ taskMacro.languageSpecificTask('csharp', '0.2') }},
-        "TaskDefinitionLangFSharp": {{ taskMacro.languageSpecificTask('fsharp', '0.2') }},
-        "TaskDefinitionLangVBNet": {{ taskMacro.languageSpecificTask('vbnet', '0.2') }}
+        "TaskDefinitionLangCSharp": {{ taskMacro.languageSpecificTask('csharp', '0.3') }},
+        "TaskDefinitionLangFSharp": {{ taskMacro.languageSpecificTask('fsharp', '0.3') }},
+        "TaskDefinitionLangVBNet": {{ taskMacro.languageSpecificTask('vbnet', '0.3') }}
     }
 }
