@@ -86,3 +86,9 @@ In case the folder does not have a .git folder, create one by running `git init`
 ```
 ./deployToECR.sh kotlin 577770582757.dkr.ecr.eu-west-1.amazonaws.com
 ```
+
+# Remote building containers
+
+For some container (Dotnet), it is not possible to build and test them locally.
+For this, you need to use an EC2 instance.
+See the "devtest-machines" project for that.
