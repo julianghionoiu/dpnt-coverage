@@ -152,6 +152,7 @@ Define an environment by duplicating the configuration file in `./config`
 Get a Python env configured
 ```shell
 python3 -m venv venv
+
 . venv/bin/activate
 pip install -r requirements.txt
 ```

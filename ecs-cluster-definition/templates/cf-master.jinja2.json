@@ -66,12 +66,12 @@
             }
         },
         "TaskDefinitionLangHmmm": {{ taskMacro.languageSpecificTask('hmmm', '0.2') }},
-        "TaskDefinitionLangJava": {{ taskMacro.languageSpecificTask('java', '0.3') }},
-        "TaskDefinitionLangKotlin": {{ taskMacro.languageSpecificTask('kotlin', '0.1') }},
+        "TaskDefinitionLangJava": {{ taskMacro.languageSpecificTask('java', '0.4') }},
+        "TaskDefinitionLangKotlin": {{ taskMacro.languageSpecificTask('kotlin', '0.2') }},
         "TaskDefinitionLangNodejs": {{ taskMacro.languageSpecificTask('nodejs', '0.2') }},
         "TaskDefinitionLangPython": {{ taskMacro.languageSpecificTask('python', '0.5') }},
         "TaskDefinitionLangRuby": {{ taskMacro.languageSpecificTask('ruby', '0.2') }},
-        "TaskDefinitionLangScala": {{ taskMacro.languageSpecificTask('scala', '0.2') }},
+        "TaskDefinitionLangScala": {{ taskMacro.languageSpecificTask('scala', '0.3') }},
         "TaskDefinitionLangCSharp": {{ taskMacro.languageSpecificTask('csharp', '0.3') }},
         "TaskDefinitionLangFSharp": {{ taskMacro.languageSpecificTask('fsharp', '0.3') }},
         "TaskDefinitionLangVBNet": {{ taskMacro.languageSpecificTask('vbnet', '0.3') }}
