@@ -1,29 +1,19 @@
 ARG BASE_IMAGE
 FROM --platform=linux/amd64 ${BASE_IMAGE}
 
-ENV SCALA_VERSION 2.12.8
-
-# Install Scala
-## Installing openjdk-8-jdk to prevent the jre-headless or jdk-headless errors from occurring
-RUN apt-get --fix-broken install
-RUN apt-get update && apt-get install -qy openjdk-11-jdk
-
-RUN wget www.scala-lang.org/files/archive/scala-$SCALA_VERSION.deb
-RUN dpkg -i scala-$SCALA_VERSION.deb
-RUN scala -version
-
 # Install sbt
 ## Not downloading a fixed version but expecting debian to give us one
-RUN echo "deb https://dl.bintray.com/sbt/debian /" | tee -a /etc/apt/sources.list.d/sbt.list
-RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823
-RUN apt-get install apt-transport-https
+RUN apt-get install apt-transport-https curl gnupg -yqq
+RUN echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | tee /etc/apt/sources.list.d/sbt.list
+RUN echo "deb https://repo.scala-sbt.org/scalasbt/debian /" | tee /etc/apt/sources.list.d/sbt_old.list
+RUN curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | gpg --no-default-keyring --keyring gnupg-ring:/etc/apt/trusted.gpg.d/scalasbt-release.gpg --import
+RUN chmod 644 /etc/apt/trusted.gpg.d/scalasbt-release.gpg
 RUN apt-get update && apt-get install sbt
 
 # Precache dependencies for faster run - will populate the IVY cache
 ENV SBT_BUILD_TMP /tmp/sbt
 RUN mkdir -p ${SBT_BUILD_TMP} && \
-    git clone --depth 1 https://github.com/julianghionoiu/tdl-runner-scala.git ${SBT_BUILD_TMP}
+    git clone --depth 1 https://github.com/io-accelerate/tdl-runner-scala.git ${SBT_BUILD_TMP}
 RUN ( cd ${SBT_BUILD_TMP} && sbt --debug update )
 
-RUN scala -version
-RUN sbt sbtVersion
+RUN sbt --version

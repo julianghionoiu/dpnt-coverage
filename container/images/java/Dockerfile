@@ -3,7 +3,7 @@ FROM --platform=linux/amd64 ${BASE_IMAGE}
 
 # Precache dependencies for faster run - will populate the Maven cache
 RUN mkdir -p /tmp/gradle/wrapper
-ARG JAVA_RUNNER_REPO=https://raw.githubusercontent.com/julianghionoiu/tdl-runner-java/master
+ARG JAVA_RUNNER_REPO=https://raw.githubusercontent.com/io-accelerate/tdl-runner-java/master
 ADD ${JAVA_RUNNER_REPO}/gradle/wrapper/gradle-wrapper.properties /tmp/gradle/wrapper/gradle-wrapper.properties
 ADD ${JAVA_RUNNER_REPO}/gradle/wrapper/gradle-wrapper.jar /tmp/gradle/wrapper/gradle-wrapper.jar
 ADD ${JAVA_RUNNER_REPO}/gradlew /tmp/gradlew
